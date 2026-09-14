@@ -1,0 +1,152 @@
+{% extends 'base.html' %}
+
+{% block title %}Manager Profile | Ana Hotel{% endblock %}
+
+{% block content %}
+
+<section class="profile-container">
+
+    <div class="profile-card">
+
+        <div class="profile-header">
+            <h1>Manager Profile</h1>
+            <p>Welcome back, {{ that_user.first_name }}!</p>
+        </div>
+
+        <div class="profile-info">
+
+            <div class="profile-item">
+                <span class="label">Full Name</span>
+                <span class="value">
+                    {{ that_user.first_name }} {{ that_user.last_name }}
+                </span>
+            </div>
+
+            <div class="profile-item">
+                <span class="label">Username</span>
+                <span class="value">{{ that_user.username }}</span>
+            </div>
+
+            <div class="profile-item">
+                <span class="label">Email</span>
+                <span class="value">{{ that_user.email }}</span>
+            </div>
+
+            <div class="profile-item">
+                <span class="label">Phone</span>
+                <span class="value">{{ that_user.phone }}</span>
+            </div>
+
+            <div class="profile-item">
+                <span class="label">Role</span>
+                <span class="value">{{ that_user.groups.first.name }}</span>
+            </div>
+
+            <div class="profile-item">
+                <span class="label">Date Joined</span>
+                <span class="value">{{ that_user.date_join }}</span>
+            </div>
+
+            <div class="profile-item">
+                <span class="label">Last Login</span>
+                <span class="value">{{ that_user.last_login }}</span>
+            </div>
+
+        </div>
+
+        <hr>
+
+        <h2>Hotel Statistics</h2>
+
+        <div class="stats-grid">
+
+            <div class="stat-card">
+                <h3>{{ total_rooms }}</h3>
+                <p>Total Rooms</p>
+            </div>
+
+            <div class="stat-card">
+                <h3>{{ available_rooms }}</h3>
+                <p>Available Rooms</p>
+            </div>
+
+            <div class="stat-card">
+                <h3>{{ total_reservations }}</h3>
+                <p>Total Reservations</p>
+            </div>
+
+            <div class="stat-card">
+                <h3>{{ active_reservations }}</h3>
+                <p>Active Reservations</p>
+            </div>
+
+            <div class="stat-card">
+                <h3>{{ cancelled_reservations }}</h3>
+                <p>Cancelled Reservations</p>
+            </div>
+
+            <div class="stat-card">
+                <h3>{{ total_customers }}</h3>
+                <p>Registered Customers</p>
+            </div>
+
+        </div>
+
+
+        <hr>
+
+        <hr>
+
+<h2>Customer Messages</h2>
+
+{% if contacts %}
+<table class="reservations-table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Message</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for contact in contacts %}
+        <tr>
+            <td>{{ contact.first_name }}</td>
+            <td>{{ contact.email }}</td>
+            <td>{{ contact.message }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% else %}
+<p>No customer messages.</p>
+{% endif %}
+
+        <div class="manager-actions">
+
+            <a href="{% url 'dashboard' %}" class="profile-btn">
+                Reservations
+            </a>
+
+            <a href="{% url 'rooms' %}" class="profile-btn">
+                Manage Rooms
+            </a>
+
+            <a href="/admin/" class="profile-btn">
+                Admin Panel
+            </a>
+
+        </div>
+
+                <div class="profile-actions">
+            <a href="#" class="btn ghost">Change Password</a>
+            <a href="/account/logout" class="btn danger">Logout</a>
+        </div>
+
+    </div>
+
+</section>
+
+{% endblock %}

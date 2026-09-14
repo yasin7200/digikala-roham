@@ -1,0 +1,9 @@
+# comments ....
+# ignore a file types 
+*.pyc
+#-----------------------------
+# ignore a specific file
+# manage.py
+#------------------------------
+# ignore a directory 
+# media/

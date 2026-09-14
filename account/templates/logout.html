@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Logout
+{% endblock %}
+
+{% block content %}
+<div class="logout-message" style="text-align: center; margin-top: 100px;">
+    <h2>You have successfully logged out.</h2>
+    <a href="/account/login" class="btn-logout" style="display: inline-block; margin-top: 20px; 
+       padding: 10px 20px; background-color: #0037ff; color: white; border-radius: 5px; text-decoration: none;">
+       Login Again
+    </a>
+</div>
+{% endblock %}
