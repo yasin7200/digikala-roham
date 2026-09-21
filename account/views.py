@@ -1,5 +1,6 @@
 from .models import User, UserProfile
 from django.shortcuts import render, redirect
+from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 import re
 import requests
@@ -69,39 +70,39 @@ def register_view(request):
 
         # ---- check all the form ---- #
         if all(f == "" for f in form):
-            return render(request, "index.html", {"error": "Pls Fill Out The Form First!"})
+            return render(request, "register.html", {"error": "Pls Fill Out The Form First!"})
         
         # ---- check each part of form ---- #
         if form[0] == "":
-            return render(request, "index.html", {"error": "You Did not fill out the Name!"})
+            return render(request, "register.html", {"error": "You Did not fill out the Name!"})
         if form[1] == "":
-            return render(request, "index.html", {"error": "You Did not fill out the Last Name!"})
+            return render(request, "register.html", {"error": "You Did not fill out the Last Name!"})
         if form[2] == "":
-            return render(request, "index.html", {"error": "You Did not fill out the Password!"})
+            return render(request, "register.html", {"error": "You Did not fill out the Password!"})
         if form[3] == "":
-            return render(request, "index.html", {"error": "You Did not fill out the Password!"})
+            return render(request, "register.html", {"error": "You Did not fill out the Password!"})
         if form[4] == "":
-            return render(request, "index.html", {"error": "You Did not fill out the Email!"})
+            return render(request, "register.html", {"error": "You Did not fill out the Email!"})
         if form[5] == "":
-            return render(request, "index.html", {"error": "You Did not fill out the Username!"})
+            return render(request, "register.html", {"error": "You Did not fill out the Username!"})
         if form[6] == "":
-            return render(request, "index.html", {"error": "You Did not fill out the Phone!"})
+            return render(request, "register.html", {"error": "You Did not fill out the Phone!"})
         if form[7] == "":
-            return render(request, "index.html", {"error": "You Did not fill out the National ID!"})
+            return render(request, "register.html", {"error": "You Did not fill out the National ID!"})
         if form[8] == "":
-            return render(request, "index.html", {"error": "You Did not fill out the Birthday!"})
+            return render(request, "register.html", {"error": "You Did not fill out the Birthday!"})
 
         # --- PASSWORD MATCH ---
         if p_1 != p_2:
-            return render(request, "index.html", {"error": "Two passwords do not match!"})
+            return render(request, "register.html", {"error": "Two passwords do not match!"})
 
         # --- EMAIL VALIDATION ---
         if not is_valid_email(email):
-            return render(request, "index.html", {"error": "Email is not valid!"})
+            return render(request, "register.html", {"error": "Email is not valid!"})
 
         # --- PASSWORD VALIDATION ---
         if not is_strong_password(p_1):
-            return render(request, "index.html", {
+            return render(request, "register.html", {
                 "error": "Password must contain at least 8 chars, a number and a lowercase!"
             })
 
@@ -113,13 +114,13 @@ def register_view(request):
         # --- CHECK USERNAME / EMAIL / PHONE ---
         try:
             User.objects.get(email=email)
-            return render(request, "index.html", {"error": "This email is already selected!"})
+            return render(request, "register.html", {"error": "This email is already selected!"})
         except User.DoesNotExist:
             pass
 
         try:
             User.objects.get(phone=phone)
-            return render(request, "index.html", {"error": "This phone number is already selected!"})
+            return render(request, "register.html", {"error": "This phone number is already selected!"})
         except User.DoesNotExist:
             pass
 
@@ -137,10 +138,10 @@ def register_view(request):
 
 
     
-        return render(request, "index.html", {"success": "Registration successful! Please login."})
+        return render(request, "register.html", {"success": "Registration successful! Please login."})
 
     else:
-        return render(request, "index.html")
+        return render(request, "register.html")
 
 
 # -----------------------------
@@ -156,9 +157,9 @@ def login_view(request):
             login(request, the_user)
             return redirect('profile')
         else:
-            return render(request, 'index.html', {'error': 'The Email Or Password Not Found'})
+            return render(request, 'login.html', {'error': 'The Email Or Password Not Found'})
     else:
-        return render(request, 'index.html')
+        return render(request, 'login.html')
 
 
 # -----------------------------
@@ -166,27 +167,66 @@ def login_view(request):
 # -----------------------------
 def logout_view(request):
     logout(request)
-    return render(request, "index.html")
+    return render(request, "login.html")
 
 
 # -----------------------------
 # PROFILE VIEW
 # -----------------------------
 
+def _get_user_profile(user):
+    profile = UserProfile.objects.filter(user=user).first()
+    if profile is not None:
+        return profile
+    for attr in ('profile', 'userprofile', 'user_profile'):
+        try:
+            obj = getattr(user, attr)
+            if obj is not None:
+                return obj
+        except Exception:
+            continue
+    return None
+
+
+
 def profile_view(request):
-    that_user = request.user
-    return render(request, 'Cprofile.html', {'that_user':that_user})
+    profile = _get_user_profile(request.user)
+    has_address = bool(profile and str(profile.address or '').strip())
+    has_image = bool(profile and profile.image and getattr(profile.image, 'name', None))
+    profile_complete = has_address or has_image
+    return render(request, 'profile.html', {
+        'profile': profile,
+        'profile_complete': profile_complete,
+        'has_address': has_address,
+        'has_image': has_image,
+    })
 
 
-def add_user_profile_view(request):
-    if request.method == "POST":
-        UserProfile.objects.update_or_create(
-            user=request.user,
-            defaults={
-                "image": request.FILES.get("image"),
-                "address": request.POST.get("address"),
-            }
-        )
-        return redirect("profile")
 
-    return render(request, "add_user_profile.html")
+def add_profile_view(request):
+    profile = _get_user_profile(request.user)
+    if profile is None:
+        profile = UserProfile.objects.create(user=request.user)
+
+    profile_exists = bool(
+        str(profile.address or '').strip()
+        or (profile.image and getattr(profile.image, 'name', None))
+    )
+
+    if request.method == 'POST':
+        address = request.POST.get('address', '').strip()
+        image = request.FILES.get('image')
+        profile.address = address
+        if image:
+            profile.image = image
+        profile.save()
+        if profile_exists:
+            messages.success(request, 'پروفایل با موفقیت به‌روزرسانی شد.')
+        else:
+            messages.success(request, 'اطلاعات پروفایل با موفقیت اضافه شد.')
+        return redirect('profile')
+
+    return render(request, 'add_user_profile.html', {
+        'profile': profile,
+        'profile_exists': profile_exists,
+    })

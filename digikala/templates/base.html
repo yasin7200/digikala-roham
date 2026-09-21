@@ -1,0 +1,139 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}فروشگاه{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="{% static 'style.css' %}" />
+  {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="navbar-inner">
+
+      <a href="{% url 'home' %}" class="nav-logo">دیجی<span>کالا</span></a>
+
+      <div class="nav-search">
+        <form method="get" action="{% url 'products' %}">
+          <input type="text" name="q" placeholder="جستجو در محصولات..." value="{{ request.GET.q }}" />
+          <button type="submit" aria-label="جستجو">🔍</button>
+        </form>
+      </div>
+
+      <ul class="nav-links" id="navLinks">
+        <li class="nav-item">
+          <a href="{% url 'home' %}" class="nav-link">صفحه اصلی</a>
+        </li>
+        <li class="nav-item">
+          <a href="{% url 'products' %}" class="nav-link">محصولات</a>
+        </li>
+        <li class="nav-item">
+          <button type="button" class="nav-link" onclick="toggleDropdown(this)">
+            دسته‌بندی‌ها
+            <span class="arrow">▼</span>
+          </button>
+          <div class="dropdown">
+            {% for cat in categories %}
+              <a href="{% url 'products' %}?category={{ cat.id }}" class="dropdown-item">{{ cat.title }}</a>
+            {% empty %}
+              <a href="{% url 'products' %}" class="dropdown-item">همه دسته‌ها</a>
+              <a href="{% url 'products' %}" class="dropdown-item">موبایل</a>
+              <a href="{% url 'products' %}" class="dropdown-item">لپ‌تاپ</a>
+              <a href="{% url 'products' %}" class="dropdown-item">لوازم خانگی</a>
+            {% endfor %}
+          </div>
+        </li>
+        <li class="nav-item">
+          <button type="button" class="nav-link" onclick="toggleDropdown(this)">
+            برندها
+            <span class="arrow">▼</span>
+          </button>
+          <div class="dropdown">
+            {% for brand in brands %}
+              <a href="{% url 'products' %}?brand={{ brand }}" class="dropdown-item">{{ brand }}</a>
+            {% empty %}
+              <a href="{% url 'products' %}" class="dropdown-item">سامسونگ</a>
+              <a href="{% url 'products' %}" class="dropdown-item">اپل</a>
+              <a href="{% url 'products' %}" class="dropdown-item">شیائومی</a>
+            {% endfor %}
+          </div>
+        </li>
+      </ul>
+
+      <div class="nav-actions">
+        {% if user.is_authenticated %}
+          <a href="{% url 'profile' %}" class="nav-action-btn">
+            <span class="icon">👤</span>
+            <span>پروفایل</span>
+          </a>
+        {% else %}
+          <a href="{% url 'login' %}" class="nav-action-btn">
+            <span class="icon">👤</span>
+            <span>ورود</span>
+          </a>
+        {% endif %}
+        <a href="#" class="nav-action-btn">
+          <span class="icon">🛒</span>
+          <span>سبد</span>
+          <span class="cart-badge">0</span>
+        </a>
+        <button type="button" class="nav-toggle" id="navToggle" aria-label="منو">☰</button>
+      </div>
+
+    </div>
+  </nav>
+
+  <main class="main-content">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-col">
+        <h4>دسترسی سریع</h4>
+        <a href="{% url 'home' %}">صفحه اصلی</a>
+        <a href="{% url 'products' %}">همه محصولات</a>
+        <a href="{% url 'login' %}">ورود / ثبت‌نام</a>
+      </div>
+      <div class="footer-col">
+        <h4>خدمات مشتریان</h4>
+        <a href="#">پاسخ به پرسش‌ها</a>
+        <a href="#">رویه‌های بازگرداندن کالا</a>
+        <a href="#">شرایط استفاده</a>
+      </div>
+      <div class="footer-col">
+        <h4>با فروشگاه</h4>
+        <a href="#">درباره ما</a>
+        <a href="#">تماس با ما</a>
+        <a href="#">فرصت‌های شغلی</a>
+      </div>
+      <div class="footer-col">
+        <h4>همراه ما باشید</h4>
+        <a href="#">اینستاگرام</a>
+        <a href="#">تلگرام</a>
+        <a href="#">توییتر</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      © ۱۴۰۵ فروشگاه اینترنتی — تمامی حقوق محفوظ است.
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById('navToggle').addEventListener('click', function () {
+      document.getElementById('navLinks').classList.toggle('open');
+    });
+    function toggleDropdown(btn) {
+      if (window.innerWidth <= 900) {
+        btn.parentElement.classList.toggle('open');
+      }
+    }
+  </script>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>
