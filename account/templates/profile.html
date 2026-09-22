@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}پروفایل | فروشگاه{% endblock %}
+
+{% block content %}
+<div class="profile-wrapper">
+  <div class="profile-card">
+
+    <div class="profile-header">
+      <div class="profile-avatar">
+        {% if has_image %}
+          <img src="{{ profile.image.url }}" alt="آواتار" />
+        {% else %}
+          {{ user.first_name|first|default:"👤" }}
+        {% endif %}
+      </div>
+      <div class="profile-main-info">
+        <h2>{{ user.get_full_name|default:user.username }}</h2>
+        <span class="profile-username">@{{ user.username }}</span>
+        <p class="profile-email">{{ user.email }}</p>
+      </div>
+    </div>
+
+    <div class="profile-divider"></div>
+
+    <div class="profile-grid">
+      <div class="profile-item">
+        <span class="label">نام</span>
+        <span class="value">{{ user.first_name }}</span>
+      </div>
+      <div class="profile-item">
+        <span class="label">نام خانوادگی</span>
+        <span class="value">{{ user.last_name }}</span>
+      </div>
+      <div class="profile-item">
+        <span class="label">موبایل</span>
+        <span class="value">{{ user.phone }}</span>
+      </div>
+      <div class="profile-item">
+        <span class="label">کد ملی</span>
+        <span class="value">{{ user.national_id }}</span>
+      </div>
+      <div class="profile-item">
+        <span class="label">تاریخ تولد</span>
+        <span class="value">{{ user.birthday|date:"Y/m/d" }}</span>
+      </div>
+      <div class="profile-item">
+        <span class="label">تاریخ عضویت</span>
+        <span class="value">{{ user.date_join|date:"Y/m/d" }}</span>
+      </div>
+      <div class="profile-item">
+        <span class="label">آخرین ورود</span>
+        <span class="value">{{ user.last_login|date:"Y/m/d H:i"|default:"—" }}</span>
+      </div>
+      <div class="profile-item">
+        <span class="label">وضعیت حساب</span>
+        <span class="value">{% if user.is_active %}فعال{% else %}غیرفعال{% endif %}</span>
+      </div>
+
+      {% if has_address %}
+      <div class="profile-item" style="grid-column: 1 / -1;">
+        <span class="label">آدرس</span>
+        <span class="value">{{ profile.address }}</span>
+      </div>
+      {% endif %}
+    </div>
+
+    <div class="profile-actions">
+      {% if profile_complete %}
+        <a href="{% url 'add_profile' %}" class="btn-primary">به‌روزرسانی پروفایل</a>
+      {% else %}
+        <a href="{% url 'add_profile' %}" class="btn-primary">افزودن آدرس و تصویر پروفایل</a>
+      {% endif %}
+      <a href="{% url 'logout' %}" class="btn-outline">خروج از حساب</a>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
