@@ -1,43 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="fa" dir="rtl">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>محصولات | فروشگاه</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="{% static 'css/products.css' %}" />
-</head>
-<body>
-
-  <!-- Header -->
-  <header class="header">
-    <div class="header-top">
-      <a href="#" class="logo">دیجی<span>کالا</span></a>
-
-      <div class="search-box">
-        <form method="get" action="">
-          <input type="text" name="q" placeholder="جستجو در محصولات..." value="{{ request.GET.q }}" />
-          <button type="submit" aria-label="جستجو">🔍</button>
-        </form>
-      </div>
-
-      <div class="header-actions">
-        <button class="header-btn" type="button">
-          <span class="icon">👤</span>
-          <span>ورود / ثبت‌نام</span>
-        </button>
-        <button class="header-btn" type="button">
-          <span class="icon">🛒</span>
-          <span>سبد خرید</span>
-          <span class="cart-badge">0</span>
-        </button>
-      </div>
-    </div>
-  </header>
+{% block content %}
 
   <!-- Breadcrumb -->
   <nav class="breadcrumb">
@@ -124,11 +87,10 @@
 
       <!-- Product Grid -->
       <div class="product-grid">
-
         {% for product in all_pro %}
           <article class="product-card">
             <div class="product-img-wrap">
-              <div class="product-placeholder">بدون تصویر</div>
+                <a href="{% url 'product_detail' product.slug %}"><img src="{{ product.image.url }}" alt="{{ product.title }}"></a>
             </div>
             <div class="product-body">
               <h3 class="product-title">{{ product.title }}</h3>
@@ -147,17 +109,23 @@
               <div class="product-price-area">
                 <div class="current-price">
                   <div class="price">
-                    {{ product.price|floatformat:0 }} <span>تومان</span>
+                    {{ product.price }} <span>تومان</span>
                   </div>
                 </div>
                 <div class="product-meta">
                   <span>فروشنده: {{ product.seller }}</span>
-                  {% if product.counts > 0 %}
-                    <span class="stock-ok">موجود ({{ product.counts }})</span>
+                  <form action="{% url 'cart_add' product.id %}" method="post" class="add-to-cart-form">
+                    {% csrf_token %}
+                    <input type="hidden" name="quantity" value="1">
+                    <button type="submit" class="auth-btn secondary" {% if product.counts < 1 %}disabled{% endif %}>
+                      افزودن به سبد
+                    </button>
+                  </form>
+                  {% if product.counts > 1 %}
                   {% else %}
                     <span class="stock-low">ناموجود</span>
                   {% endif %}
-                </div>
+                </div>  
               </div>
             </div>
           </article>
@@ -182,18 +150,6 @@
     </section>
   </div>
 
-  <script>
-    function toggleSidebar() {
-      document.getElementById('sidebar').classList.toggle('open');
-      document.getElementById('overlay').classList.toggle('show');
-    }
+{% endblock %}
 
-    document.querySelectorAll('.sort-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-      });
-    });
-  </script>
-</body>
-</html>
+

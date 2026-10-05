@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}سبد خرید{% endblock %}
+
+{% block content %}
+<div class="main-container" style="display:block; max-width:960px; margin:24px auto; padding:0 16px 40px;">
+  <h1 style="font-size:1.5rem; margin-bottom:20px; font-weight:700;">سبد خرید</h1>
+
+  {% if items %}
+  <div style="background:#fff; border-radius:12px; box-shadow:0 1px 4px rgba(0,0,0,.08); overflow:hidden;">
+    <table style="width:100%; border-collapse:collapse;">
+      <thead>
+        <tr style="background:#f8fffe; border-bottom:1px solid #e0e0e2;">
+          <th style="padding:14px 16px; text-align:right; font-size:13px; color:#81858b;">محصول</th>
+          <th style="padding:14px 16px; text-align:center; font-size:13px; color:#81858b;">قیمت واحد</th>
+          <th style="padding:14px 16px; text-align:center; font-size:13px; color:#81858b;">تعداد</th>
+          <th style="padding:14px 16px; text-align:center; font-size:13px; color:#81858b;">جمع</th>
+          <th style="padding:14px 16px;"></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in items %}
+        <tr style="border-bottom:1px solid #e0e0e2;">
+          <td style="padding:16px;">
+            <div style="display:flex; align-items:center; gap:12px;">
+              {% if item.product.image %}
+              <img src="{{ item.product.image.url }}" alt="" style="width:64px; height:64px; object-fit:cover; border-radius:8px;">
+              {% endif %}
+              <div>
+                <div style="font-weight:600; font-size:14px;">{{ item.product.title }}</div>
+                <div style="font-size:12px; color:#81858b;">{{ item.product.brand }}</div>
+              </div>
+            </div>
+          </td>
+          <td style="padding:16px; text-align:center; font-weight:600;">
+            {{ item.unit_price }} تومان
+            {% if item.product.discount %}
+            <div style="font-size:11px; color:#0d9488;">{{ item.product.discount }}٪ تخفیف</div>
+            {% endif %}
+          </td>
+          <td style="padding:16px; text-align:center;">
+            <form action="{% url 'cart_update' item.product.id %}" method="post" style="display:inline-flex; align-items:center; gap:6px;">
+              {% csrf_token %}
+              <input type="number" name="quantity" value="{{ item.quantity }}" min="1"
+                     style="width:60px; height:36px; border:1px solid #e0e0e2; border-radius:8px; text-align:center; font-family:inherit;">
+              <button type="submit" style="height:36px; padding:0 12px; border:none; border-radius:8px; background:#0d9488; color:#fff; cursor:pointer; font-family:inherit; font-size:12px;">بروزرسانی</button>
+            </form>
+          </td>
+          <td style="padding:16px; text-align:center; font-weight:700;">{{ item.line_total }} تومان</td>
+          <td style="padding:16px; text-align:center;">
+            <form action="{% url 'cart_remove' item.product.id %}" method="post">
+              {% csrf_token %}
+              <button type="submit" style="background:#fef2f2; color:#dc2626; border:none; border-radius:8px; padding:8px 12px; cursor:pointer; font-family:inherit; font-size:12px;">حذف</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div style="margin-top:20px; display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:16px;">
+    <form action="{% url 'cart_clear' %}" method="post">
+      {% csrf_token %}
+      <button type="submit" style="background:transparent; border:2px solid #e0e0e2; border-radius:10px; padding:10px 18px; cursor:pointer; font-family:inherit; font-weight:600;">خالی کردن سبد</button>
+    </form>
+    <div style="background:#fff; border-radius:12px; padding:20px 28px; box-shadow:0 1px 4px rgba(0,0,0,.08); min-width:240px;">
+      <div style="font-size:13px; color:#81858b; margin-bottom:6px;">تعداد اقلام: {{ total_items }}</div>
+      <div style="font-size:1.25rem; font-weight:700; color:#0d9488; margin-bottom:14px;">جمع کل: {{ total_price }} تومان</div>
+      <a href="#" style="display:block; text-align:center; background:linear-gradient(135deg,#0d9488,#0f766e); color:#fff; padding:12px; border-radius:10px; font-weight:600; text-decoration:none;">ادامه خرید / پرداخت</a>
+    </div>
+  </div>
+  {% else %}
+  <div style="background:#fff; border-radius:12px; padding:48px 24px; text-align:center; box-shadow:0 1px 4px rgba(0,0,0,.08);">
+    <p style="font-size:1.1rem; color:#81858b; margin-bottom:16px;">سبد خرید شما خالی است.</p>
+    <a href="{% url 'products' %}" style="display:inline-block; background:#0d9488; color:#fff; padding:12px 24px; border-radius:10px; font-weight:600; text-decoration:none;">مشاهده محصولات</a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

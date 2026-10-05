@@ -6,30 +6,11 @@ import re
 import requests
 
 
-# -----------------------------
-# EMAIL VALIDATOR
-# -----------------------------
 def is_valid_email(email):
     pattern = r'^[\w\.-]+@[\w\.-]+\.\w+$'
     return re.match(pattern, email) is not None
 
 
-#------------------------------
-# National ID Validator
-#------------------------------
-# def validate_national_id(national_id_x):
-#     sabt_url = 'http://127.0.0.1:8000/api/person?format=json'
-#     response = requests.get(sabt_url)
-#     data = response.json()   # list of persons in dict type
-#     for person in data:        # each person in data is one dictionary
-#         if person.get('national_id') == str(national_id_x):
-#             return True
-#     return False
-
-
-# -----------------------------
-# PASSWORD VALIDATOR
-# -----------------------------
 def is_strong_password(pw):
     if len(pw) < 8:
         return False
@@ -39,17 +20,13 @@ def is_strong_password(pw):
         return False
     return True
 
-
-# -----------------------------
-# REGISTER VIEW
-# -----------------------------
+# register
 def register_view(request):
     if request.method == 'POST':
-        
         name = request.POST.get("first_name")
         last_name = request.POST.get("last_name")
-        p_1 = request.POST.get("password_1")
-        p_2 = request.POST.get("password_2")
+        p_1 = request.POST.get("password1")
+        p_2 = request.POST.get("password2")
         email = request.POST.get("email")
         username = request.POST.get("username")
         phone = request.POST.get("phone")
@@ -68,64 +45,52 @@ def register_view(request):
             birthday.strip() if birthday else ""
         ]
 
-        # ---- check all the form ---- #
         if all(f == "" for f in form):
-            return render(request, "register.html", {"error": "Pls Fill Out The Form First!"})
-        
-        # ---- check each part of form ---- #
+            return render(request, "register.html", {"error": "لطفاً ابتدا فرم را پر کنید."})
+
         if form[0] == "":
-            return render(request, "register.html", {"error": "You Did not fill out the Name!"})
+            return render(request, "register.html", {"error": "نام را وارد نکرده‌اید."})
         if form[1] == "":
-            return render(request, "register.html", {"error": "You Did not fill out the Last Name!"})
+            return render(request, "register.html", {"error": "نام خانوادگی را وارد نکرده‌اید."})
         if form[2] == "":
-            return render(request, "register.html", {"error": "You Did not fill out the Password!"})
+            return render(request, "register.html", {"error": "رمز عبور را وارد نکرده‌اید."})
         if form[3] == "":
-            return render(request, "register.html", {"error": "You Did not fill out the Password!"})
+            return render(request, "register.html", {"error": "تکرار رمز عبور را وارد نکرده‌اید."})
         if form[4] == "":
-            return render(request, "register.html", {"error": "You Did not fill out the Email!"})
+            return render(request, "register.html", {"error": "ایمیل را وارد نکرده‌اید."})
         if form[5] == "":
-            return render(request, "register.html", {"error": "You Did not fill out the Username!"})
+            return render(request, "register.html", {"error": "نام کاربری را وارد نکرده‌اید."})
         if form[6] == "":
-            return render(request, "register.html", {"error": "You Did not fill out the Phone!"})
+            return render(request, "register.html", {"error": "شماره موبایل را وارد نکرده‌اید."})
         if form[7] == "":
-            return render(request, "register.html", {"error": "You Did not fill out the National ID!"})
+            return render(request, "register.html", {"error": "کد ملی را وارد نکرده‌اید."})
         if form[8] == "":
-            return render(request, "register.html", {"error": "You Did not fill out the Birthday!"})
+            return render(request, "register.html", {"error": "تاریخ تولد را وارد نکرده‌اید."})
 
-        # --- PASSWORD MATCH ---
         if p_1 != p_2:
-            return render(request, "register.html", {"error": "Two passwords do not match!"})
+            return render(request, "register.html", {"error": "دو رمز عبور یکسان نیستند."})
 
-        # --- EMAIL VALIDATION ---
         if not is_valid_email(email):
-            return render(request, "register.html", {"error": "Email is not valid!"})
+            return render(request, "register.html", {"error": "ایمیل معتبر نیست."})
 
-        # --- PASSWORD VALIDATION ---
         if not is_strong_password(p_1):
             return render(request, "register.html", {
-                "error": "Password must contain at least 8 chars, a number and a lowercase!"
+                "error": "رمز عبور باید حداقل ۸ کاراکتر، یک عدد و یک حرف کوچک داشته باشد."
             })
 
-        # if not validate_national_id(national_id):
-        #     return render(request, "index.html", {
-        #                     "error": "Sorry Your National ID is not Valid!"
-        #                 })
-
-        # --- CHECK USERNAME / EMAIL / PHONE ---
         try:
             User.objects.get(email=email)
-            return render(request, "register.html", {"error": "This email is already selected!"})
+            return render(request, "register.html", {"error": "این ایمیل قبلاً ثبت شده است."})
         except User.DoesNotExist:
             pass
 
         try:
             User.objects.get(phone=phone)
-            return render(request, "register.html", {"error": "This phone number is already selected!"})
+            return render(request, "register.html", {"error": "این شماره موبایل قبلاً ثبت شده است."})
         except User.DoesNotExist:
             pass
 
-        # --- CREATE THE USER ---
-        new_user = User.objects.create_user(
+        User.objects.create_user(
             first_name=name,
             last_name=last_name,
             email=email,
@@ -136,17 +101,12 @@ def register_view(request):
             birthday=birthday
         )
 
-
-    
-        return render(request, "register.html", {"success": "Registration successful! Please login."})
+        return render(request, "register.html", {"success": "ثبت‌نام با موفقیت انجام شد. لطفاً وارد شوید."})
 
     else:
         return render(request, "register.html")
 
-
-# -----------------------------
-# LOGIN VIEW
-# -----------------------------
+# login
 def login_view(request):
     if request.method == 'POST':
         the_user = authenticate(
@@ -157,23 +117,16 @@ def login_view(request):
             login(request, the_user)
             return redirect('profile')
         else:
-            return render(request, 'login.html', {'error': 'The Email Or Password Not Found'})
+            return render(request, 'login.html', {'error': 'ایمیل یا رمز عبور اشتباه است.'})
     else:
         return render(request, 'login.html')
 
 
-# -----------------------------
-# LOGOUT VIEW
-# -----------------------------
 def logout_view(request):
     logout(request)
     return render(request, "login.html")
 
-
-# -----------------------------
-# PROFILE VIEW
-# -----------------------------
-
+# get user profile
 def _get_user_profile(user):
     profile = UserProfile.objects.filter(user=user).first()
     if profile is not None:
@@ -187,8 +140,7 @@ def _get_user_profile(user):
             continue
     return None
 
-
-
+# profile
 def profile_view(request):
     profile = _get_user_profile(request.user)
     has_address = bool(profile and str(profile.address or '').strip())
@@ -201,8 +153,7 @@ def profile_view(request):
         'has_image': has_image,
     })
 
-
-
+# add profile 
 def add_profile_view(request):
     profile = _get_user_profile(request.user)
     if profile is None:
