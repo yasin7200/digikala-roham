@@ -1,10 +1,12 @@
 from django.db import models
 
+
 class Category(models.Model):
     title = models.CharField(max_length=100)
 
     def __str__(self):
         return self.title
+
 
 class Product(models.Model):
     category = models.ForeignKey(Category, on_delete=models.PROTECT)
@@ -22,6 +24,7 @@ class Product(models.Model):
 
     def __str__(self):
         return self.title
+
 
 class Phone(Product):
     model = models.CharField(max_length=250)
@@ -46,6 +49,7 @@ class Phone(Product):
     speaker = models.CharField(max_length=150)
     charge_port = models.CharField(max_length=25)
 
+
 class Tablet(Phone):
     has_pen = models.BooleanField(default=False)
     pen_type = models.CharField(max_length=50, null=True, blank=True)
@@ -57,6 +61,7 @@ class Tablet(Phone):
     expand_storage = models.BooleanField(default=False)
     dimensions = models.CharField(max_length=50, null=True, blank=True)
     thickness = models.CharField(max_length=25, null=True, blank=True)
+
 
 class PC(Product):
     cpu = models.CharField(max_length=100)
@@ -77,6 +82,7 @@ class PC(Product):
     wifi = models.CharField(max_length=50)
     bluetooth = models.CharField(max_length=25)
 
+
 class Monitor(Product):
     screen_size = models.CharField(max_length=25)
     screen_resolution = models.CharField(max_length=25)
@@ -93,6 +99,7 @@ class Monitor(Product):
     stand_adjustable = models.BooleanField(default=False)
     vesa_mount = models.BooleanField(default=False)
     speakers = models.BooleanField(default=False)
+
 
 class Laptop(PC):
     
@@ -124,6 +131,7 @@ class Laptop(PC):
     thickness = models.CharField(max_length=25)
     dimensions = models.CharField(max_length=50)
 
+
 class GamingLaptop(Laptop):
     cooling_system = models.CharField(max_length=100)
     rgb_keyboard = models.BooleanField(default=True)
@@ -132,6 +140,7 @@ class GamingLaptop(Laptop):
     mux_switch = models.BooleanField(default=False)
     advanced_audio = models.CharField(max_length=80, null=True, blank=True)
     gaming_ports = models.CharField(max_length=150, null=True, blank=True)
+
 
 class Headphones(Product):
     model = models.CharField(max_length=100)
@@ -148,6 +157,7 @@ class Headphones(Product):
     water_resistance = models.CharField(max_length=30, null=True, blank=True)
     form_factor = models.CharField(max_length=50)
 
+
 class Modem(Product):
     model = models.CharField(max_length=100)
     modem_type = models.CharField(max_length=50)
@@ -159,6 +169,7 @@ class Modem(Product):
     sim_support = models.BooleanField(default=False)
     coverage_area = models.CharField(max_length=50, null=True, blank=True)
     security = models.CharField(max_length=100)
+
 
 class FlashDrive(Product):
     model = models.CharField(max_length=100)
@@ -172,6 +183,7 @@ class FlashDrive(Product):
     encryption = models.BooleanField(default=False)
     material = models.CharField(max_length=50, null=True, blank=True)
 
+
 class HardDrive(Product):
     
     model = models.CharField(max_length=100)
@@ -184,11 +196,13 @@ class HardDrive(Product):
     mtbf = models.CharField(max_length=40, null=True, blank=True)
     warranty = models.CharField(max_length=30, null=True, blank=True)
 
+
 class HDD(HardDrive):
     
     rpm = models.CharField(max_length=20)
     platter_count = models.PositiveSmallIntegerField(null=True, blank=True)
     noise_level = models.CharField(max_length=30, null=True, blank=True)
+
 
 class SSD(HardDrive):
     
@@ -197,6 +211,7 @@ class SSD(HardDrive):
     dram_cache = models.BooleanField(default=True)
     tbw = models.CharField(max_length=30, null=True, blank=True)
     pcie_generation = models.CharField(max_length=20, null=True, blank=True)
+
 
 class ExternalHardDrive(HardDrive):
     
@@ -208,10 +223,12 @@ class ExternalHardDrive(HardDrive):
     waterproof = models.BooleanField(default=False)
     shockproof = models.BooleanField(default=False)
 
+
 class NVMeSSD(SSD):
     
     heatsink = models.BooleanField(default=False)
     max_temperature = models.CharField(max_length=20, null=True, blank=True)
+
 
 class GameConsole(Product):
     model = models.CharField(max_length=100)
@@ -233,6 +250,7 @@ class GameConsole(Product):
     dimensions = models.CharField(max_length=50, null=True, blank=True)
     power_consumption = models.CharField(max_length=30, null=True, blank=True)
 
+
 class PowerBank(Product):
     model = models.CharField(max_length=100)
     capacity = models.CharField(max_length=30)
@@ -246,6 +264,7 @@ class PowerBank(Product):
     battery_type = models.CharField(max_length=40)
     display = models.BooleanField(default=False)
     protection_features = models.CharField(max_length=150, null=True, blank=True)
+
 
 class Printer(Product):
     model = models.CharField(max_length=100)
@@ -263,6 +282,7 @@ class Printer(Product):
     ink_or_toner = models.CharField(max_length=50)
     automatic_document_feeder = models.BooleanField(default=False)
     touchscreen = models.BooleanField(default=False)
+
 
 class SmartWatch(Product):
     model = models.CharField(max_length=100)
@@ -285,6 +305,7 @@ class SmartWatch(Product):
     case_material = models.CharField(max_length=50, null=True, blank=True)
     compatibility = models.CharField(max_length=100)
 
+
 class AppleWatch(SmartWatch):
     series = models.CharField(max_length=30)
     chip = models.CharField(max_length=40)
@@ -296,6 +317,7 @@ class AppleWatch(SmartWatch):
     digital_crown = models.BooleanField(default=True)
     action_button = models.BooleanField(default=False)
     titanium_case = models.BooleanField(default=False)
+
 
 class Mouse(Product):
     model = models.CharField(max_length=100)
@@ -310,6 +332,7 @@ class Mouse(Product):
     ergonomic = models.BooleanField(default=False)
     battery_life = models.CharField(max_length=40, null=True, blank=True)
     hand_orientation = models.CharField(max_length=20, null=True, blank=True)
+
 
 class Keyboard(Product):
     model = models.CharField(max_length=100)
@@ -327,6 +350,7 @@ class Keyboard(Product):
     battery_life = models.CharField(max_length=40, null=True, blank=True)
     keycap_material = models.CharField(max_length=40, null=True, blank=True)
 
+
 class Refrigerator(Product):
     model = models.CharField(max_length=100)
     capacity = models.CharField(max_length=40)
@@ -339,6 +363,7 @@ class Refrigerator(Product):
     noise_level = models.CharField(max_length=30, null=True, blank=True)
     color_body = models.CharField(max_length=40, null=True, blank=True)
 
+
 class AirConditioner(Product):
     model = models.CharField(max_length=100)
     ac_type = models.CharField(max_length=50)
@@ -350,6 +375,7 @@ class AirConditioner(Product):
     noise_level = models.CharField(max_length=30, null=True, blank=True)
     refrigerant = models.CharField(max_length=30, null=True, blank=True)
 
+
 class Sofa(Product):
     model = models.CharField(max_length=100)
     seats = models.PositiveSmallIntegerField()
@@ -358,6 +384,7 @@ class Sofa(Product):
     reclining = models.BooleanField(default=False)
     dimensions = models.CharField(max_length=50)
     style = models.CharField(max_length=40, null=True, blank=True)
+
 
 class Television(Product):
     model = models.CharField(max_length=100)
@@ -371,6 +398,7 @@ class Television(Product):
     ports = models.CharField(max_length=150)
     speakers = models.CharField(max_length=50, null=True, blank=True)
 
+
 class Speaker(Product):
     model = models.CharField(max_length=100)
     speaker_type = models.CharField(max_length=50)
@@ -381,6 +409,7 @@ class Speaker(Product):
     battery_life = models.CharField(max_length=40, null=True, blank=True)
     waterproof = models.BooleanField(default=False)
 
+
 class Bed(Product):
     model = models.CharField(max_length=100)
     size = models.CharField(max_length=40)
@@ -390,6 +419,7 @@ class Bed(Product):
     dimensions = models.CharField(max_length=50)
     style = models.CharField(max_length=40, null=True, blank=True)
 
+
 class Pillow(Product):
     model = models.CharField(max_length=100)
     fill_material = models.CharField(max_length=50)
@@ -398,6 +428,7 @@ class Pillow(Product):
     firmness = models.CharField(max_length=30, null=True, blank=True)
     washable = models.BooleanField(default=True)
     hypoallergenic = models.BooleanField(default=False)
+
 
 class Mattress(Product):
     model = models.CharField(max_length=100)
@@ -409,6 +440,7 @@ class Mattress(Product):
     layers = models.CharField(max_length=80, null=True, blank=True)
     warranty = models.CharField(max_length=30, null=True, blank=True)
 
+
 class Carpet(Product):
     model = models.CharField(max_length=100)
     size = models.CharField(max_length=40)
@@ -418,6 +450,7 @@ class Carpet(Product):
     pattern = models.CharField(max_length=50, null=True, blank=True)
     washable = models.BooleanField(default=False)
     origin = models.CharField(max_length=40, null=True, blank=True)
+
 
 class GasStove(Product):
     model = models.CharField(max_length=100)
@@ -429,6 +462,7 @@ class GasStove(Product):
     dimensions = models.CharField(max_length=50)
     safety_valve = models.BooleanField(default=True)
 
+
 class Sink(Product):
     model = models.CharField(max_length=100)
     sink_type = models.CharField(max_length=40)
@@ -437,6 +471,7 @@ class Sink(Product):
     dimensions = models.CharField(max_length=50)
     mounting = models.CharField(max_length=40)
     faucet_included = models.BooleanField(default=False)
+
 
 class WashingMachine(Product):
     model = models.CharField(max_length=100)
@@ -449,6 +484,7 @@ class WashingMachine(Product):
     dimensions = models.CharField(max_length=50)
     display = models.BooleanField(default=True)
 
+
 class Dishwasher(Product):
     model = models.CharField(max_length=100)
     capacity = models.CharField(max_length=30)
@@ -460,6 +496,7 @@ class Dishwasher(Product):
     display = models.BooleanField(default=True)
     water_usage = models.CharField(max_length=30, null=True, blank=True)
 
+
 class PackageBoiler(Product):
     model = models.CharField(max_length=100)
     boiler_type = models.CharField(max_length=40)
@@ -469,6 +506,7 @@ class PackageBoiler(Product):
     dual_circuit = models.BooleanField(default=True)
     dimensions = models.CharField(max_length=50)
     efficiency = models.CharField(max_length=30, null=True, blank=True)
+
 
 class Chandelier(Product):
     model = models.CharField(max_length=100)
@@ -480,6 +518,7 @@ class Chandelier(Product):
     dimmable = models.BooleanField(default=False)
     led = models.BooleanField(default=True)
 
+
 class Table(Product):
     model = models.CharField(max_length=100)
     table_type = models.CharField(max_length=40)
@@ -488,6 +527,7 @@ class Table(Product):
     dimensions = models.CharField(max_length=50)
     seats = models.PositiveSmallIntegerField(null=True, blank=True)
     extendable = models.BooleanField(default=False)
+
 
 class Chair(Product):
     model = models.CharField(max_length=100)
