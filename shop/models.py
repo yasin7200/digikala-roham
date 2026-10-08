@@ -46,7 +46,7 @@ class Phone(Product):
     bluetooth = models.CharField(max_length=25)
     gps = models.CharField(max_length=100)
     usb_interface = models.CharField(max_length=25)
-    speaker = models.CharField(max_length=150)
+    internal_speaker = models.CharField(max_length=150)
     charge_port = models.CharField(max_length=25)
 
 
@@ -299,7 +299,7 @@ class SmartWatch(Product):
     sleep_tracking = models.BooleanField(default=True)
     connectivity = models.CharField(max_length=80)
     cellular = models.BooleanField(default=False)
-    speaker = models.BooleanField(default=False)
+    has_speaker = models.BooleanField(default=False)
     microphone = models.BooleanField(default=False)
     strap_material = models.CharField(max_length=50, null=True, blank=True)
     case_material = models.CharField(max_length=50, null=True, blank=True)

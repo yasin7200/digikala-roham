@@ -1,199 +1,94 @@
 {% extends 'base.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="fa" dir="rtl">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>محصولات | فروشگاه</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="{% static 'css/products.css' %}" />
-</head>
-<body>
 
-  <!-- Header -->
-  <header class="header">
-    <div class="header-top">
-      <a href="#" class="logo">دیجی<span>کالا</span></a>
+{% block title %}محصولات | فروشگاه{% endblock %}
 
-      <div class="search-box">
-        <form method="get" action="">
-          <input type="text" name="q" placeholder="جستجو در محصولات..." value="{{ request.GET.q }}" />
-          <button type="submit" aria-label="جستجو">🔍</button>
-        </form>
-      </div>
+{% block content %}
+<nav class="breadcrumb">
+  <a href="{% url 'products' %}">فروشگاه</a>
+  <span>/</span>
+  <span>همه محصولات</span>
+</nav>
 
-      <div class="header-actions">
-        <button class="header-btn" type="button">
-          <span class="icon">👤</span>
-          <span>ورود / ثبت‌نام</span>
-        </button>
-        <button class="header-btn" type="button">
-          <span class="icon">🛒</span>
-          <span>سبد خرید</span>
-          <span class="cart-badge">0</span>
-        </button>
+<div class="main-container">
+  <button class="mobile-filter-btn" type="button" onclick="toggleSidebar()">فیلترها</button>
+  <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+
+  <aside class="sidebar" id="sidebar">
+    <div class="filter-section">
+      <div class="filter-title">دسته‌بندی</div>
+      <div class="filter-options">
+        <a href="{% url 'products' %}" class="filter-option">همه</a>
+        {% for cat in categories %}
+          <a href="{% url 'products' %}?category={{ cat.id }}" class="filter-option">{{ cat.title }}</a>
+        {% endfor %}
       </div>
     </div>
-  </header>
+  </aside>
 
-  <!-- Breadcrumb -->
-  <nav class="breadcrumb">
-    <a href="#">فروشگاه</a>
-    <span>/</span>
-    <span>همه محصولات</span>
-  </nav>
+  <section class="products-area">
+    <div class="products-header">
+      <div class="results-count">{{ all_pro|length }} کالا</div>
+    </div>
 
-  <!-- Main -->
-  <div class="main-container">
-
-    <!-- Mobile Filter Button -->
-    <button class="mobile-filter-btn" type="button" onclick="toggleSidebar()">
-      ⚙️ فیلترها
-    </button>
-
-    <!-- Overlay -->
-    <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
-
-    <!-- Sidebar Filters -->
-    <aside class="sidebar" id="sidebar">
-      <div class="filter-section">
-        <div class="filter-title">دسته‌بندی</div>
-        <div class="filter-options">
-          {% for cat in categories %}
-            <label class="filter-option">
-              <input type="checkbox" name="category" value="{{ cat.id }}" />
-              {{ cat.title }}
-            </label>
-          {% empty %}
-            <label class="filter-option"><input type="checkbox" /> همه دسته‌ها</label>
-          {% endfor %}
-        </div>
-      </div>
-
-      <div class="filter-section">
-        <div class="filter-title">برند</div>
-        <div class="filter-options">
-          {% for brand in brands %}
-            <label class="filter-option">
-              <input type="checkbox" name="brand" value="{{ brand }}" />
-              {{ brand }}
-            </label>
-          {% empty %}
-            <label class="filter-option"><input type="checkbox" /> همه برندها</label>
-          {% endfor %}
-        </div>
-      </div>
-
-      <div class="filter-section">
-        <div class="filter-title">محدوده قیمت (تومان)</div>
-        <div class="price-range">
-          <input type="text" name="min_price" placeholder="از" />
-          <input type="text" name="max_price" placeholder="تا" />
-        </div>
-        <button class="price-btn" type="button">اعمال فیلتر قیمت</button>
-      </div>
-
-      <div class="filter-section">
-        <div class="filter-title">فقط کالاهای موجود</div>
-        <div class="filter-options">
-          <label class="filter-option">
-            <input type="checkbox" name="in_stock" value="1" />
-            فقط موجود
-          </label>
-        </div>
-      </div>
-    </aside>
-
-    <!-- Products Area -->
-    <section class="products-area">
-
-      <!-- Header: count + sort -->
-      <div class="products-header">
-        <div class="results-count">{{ all_pro|length }} کالا</div>
-        <div class="sort-options">
-          <span class="sort-label">مرتب‌سازی:</span>
-          <button class="sort-btn active" type="button" data-sort="rate">پربازدیدترین</button>
-          <button class="sort-btn" type="button" data-sort="price_asc">ارزان‌ترین</button>
-          <button class="sort-btn" type="button" data-sort="price_desc">گران‌ترین</button>
-          <button class="sort-btn" type="button" data-sort="newest">جدیدترین</button>
-        </div>
-      </div>
-
-      <!-- Product Grid -->
-      <div class="product-grid">
-
-        {% for product in all_pro %}
-          <article class="product-card">
+    <div class="product-grid">
+      {% for product in all_pro %}
+        <article class="product-card">
+          <a href="{% url 'product_detail' product.slug %}">
             <div class="product-img-wrap">
-              <div class="product-placeholder">بدون تصویر</div>
+              {% if product.image %}
+                <img src="{{ product.image.url }}" alt="{{ product.title }}">
+              {% else %}
+                <div class="product-placeholder">بدون تصویر</div>
+              {% endif %}
             </div>
-            <div class="product-body">
-              <h3 class="product-title">{{ product.title }}</h3>
-              <div class="product-brand">{{ product.brand }}</div>
-              <div class="product-rating">
-                <span class="stars">
-                  {% if product.rate >= 4.5 %}★★★★★
-                  {% elif product.rate >= 3.5 %}★★★★☆
-                  {% elif product.rate >= 2.5 %}★★★☆☆
-                  {% elif product.rate >= 1.5 %}★★☆☆☆
-                  {% else %}★☆☆☆☆
-                  {% endif %}
-                </span>
-                <span>({{ product.rate }})</span>
-              </div>
-              <div class="product-price-area">
-                <div class="current-price">
-                  <div class="price">
-                    {{ product.price|floatformat:0 }} <span>تومان</span>
-                  </div>
-                </div>
-                <div class="product-meta">
-                  <span>فروشنده: {{ product.seller }}</span>
-                  {% if product.counts > 0 %}
-                    <span class="stock-ok">موجود ({{ product.counts }})</span>
-                  {% else %}
-                    <span class="stock-low">ناموجود</span>
-                  {% endif %}
-                </div>
-              </div>
+          </a>
+          <div class="product-body">
+            <h3 class="product-title">
+              <a href="{% url 'product_detail' product.slug %}">{{ product.title }}</a>
+            </h3>
+            <div class="product-brand">{{ product.brand }}</div>
+            <div class="product-rating">
+              <span class="stars">
+                {% if product.rate >= 4.5 %}★★★★★
+                {% elif product.rate >= 3.5 %}★★★★☆
+                {% elif product.rate >= 2.5 %}★★★☆☆
+                {% elif product.rate >= 1.5 %}★★☆☆☆
+                {% else %}★☆☆☆☆
+                {% endif %}
+              </span>
+              <span>({{ product.rate }})</span>
             </div>
-          </article>
-        {% empty %}
-          <div class="empty-state">
-            <h3>محصولی یافت نشد</h3>
-            <p>هنوز هیچ محصولی در فروشگاه ثبت نشده است.</p>
+            <div class="product-price-area">
+              <div class="price">{{ product.price }} <span>تومان</span></div>
+              <div class="product-meta">
+                <span>{{ product.seller }}</span>
+                {% if product.counts > 0 %}
+                  <span class="stock-ok">موجود</span>
+                {% else %}
+                  <span class="stock-low">ناموجود</span>
+                {% endif %}
+              </div>
+              <form action="{% url 'cart_add' product.id %}" method="post" class="add-to-cart-form">
+                {% csrf_token %}
+                <button type="submit" class="add-to-cart-btn" {% if product.counts < 1 %}disabled{% endif %}>افزودن به سبد</button>
+              </form>
+            </div>
           </div>
-        {% endfor %}
+        </article>
+      {% empty %}
+        <div class="empty-state">
+          <h3>محصولی یافت نشد</h3>
+        </div>
+      {% endfor %}
+    </div>
+  </section>
+</div>
 
-      </div>
-
-      <!-- Pagination (placeholder) -->
-      {% if all_pro %}
-      <div class="pagination">
-        <button class="page-btn" type="button" disabled>قبلی</button>
-        <button class="page-btn active" type="button">۱</button>
-        <button class="page-btn" type="button">بعدی</button>
-      </div>
-      {% endif %}
-
-    </section>
-  </div>
-
-  <script>
-    function toggleSidebar() {
-      document.getElementById('sidebar').classList.toggle('open');
-      document.getElementById('overlay').classList.toggle('show');
-    }
-
-    document.querySelectorAll('.sort-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-      });
-    });
-  </script>
-</body>
-</html>
+<script>
+  function toggleSidebar() {
+    document.getElementById('sidebar').classList.toggle('open');
+    document.getElementById('overlay').classList.toggle('show');
+  }
+</script>
+{% endblock %}

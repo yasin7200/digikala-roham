@@ -39,7 +39,7 @@
           </button>
           <div class="dropdown">
             {% for cat in categories %}
-              <a href="{% url 'products' %}?category={{ cat.id }}" class="dropdown-item">{{ cat.title }}</a>
+              <a href="{% url 'products' %}?category={{ cat.id }}">{{ cat.title }}</a>
             {% empty %}
               <a href="{% url 'products' %}" class="dropdown-item">همه دسته‌ها</a>
               <a href="{% url 'products' %}" class="dropdown-item">موبایل</a>
