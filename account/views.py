@@ -1,6 +1,7 @@
 from .models import User, UserProfile
 from django.shortcuts import render, redirect
 from django.contrib import messages
+from django.contrib.auth.models import Group
 from django.contrib.auth import authenticate, login, logout
 import re
 import requests
@@ -90,7 +91,7 @@ def register_view(request):
         except User.DoesNotExist:
             pass
 
-        User.objects.create_user(
+        new_user = User.objects.create_user(
             first_name=name,
             last_name=last_name,
             email=email,
@@ -101,7 +102,10 @@ def register_view(request):
             birthday=birthday
         )
 
-        return render(request, "register.html", {"success": "ثبت‌نام با موفقیت انجام شد. لطفاً وارد شوید."})
+        cus_group = Group.objects.get(name='customer')
+        new_user.groups.add(cus_group)
+
+        return redirect(login)
 
     else:
         return render(request, "register.html")
