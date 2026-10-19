@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     'api',
     'account',
     'home',
+    'man_pan',
     'shop',
     'rest_framework',
     'rest_framework.authtoken',
