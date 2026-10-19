@@ -1,39 +1,28 @@
 from django.shortcuts import render, get_object_or_404
 from django.contrib.contenttypes.models import ContentType
-from .models import Product, Category
+from .models import Product, Category, Monitor, PC
 
+shop_models = {'monitor': Monitor, 'pc': PC}
 
-def pro_view(request, model=None):
-    if model:
-        Model = ContentType.objects.get(app_label='shop', model=model.lower()).model_class()
-        qs = Model.objects.select_related('category').all()
-    else:
-        qs = Product.objects.select_related('category').all()
-
-    cat = request.GET.get('category')
-    if cat:
-        qs = qs.filter(category_id=cat)
-
-    brand = request.GET.get('brand')
-    if brand:
-        qs = qs.filter(brand=brand)
-
-    q = request.GET.get('q')
-    if q:
-        qs = qs.filter(title__icontains=q)
-
-    if request.GET.get('in_stock'):
-        qs = qs.filter(counts__gt=0)
+def pro_view(request, model):
+    ct = ContentType.objects.get(app_label='shop', model=model)
+    # OR
+    # ct = ContentType.objects.get_for_model(shop_models.get(model))
+    #------------------------------------------------------------------
+    # filterd_products = ct.get_all_objects_for_this_type(brand='brand')
+    #OR
+    all_pro = ct.model_class().objects.all()
+    #OR
+    # all_pro = ct.model_class()._default_manager.all()
 
     return render(request, 'products.html', {
-        'all_pro': qs,
-        'categories': Category.objects.all(),
-        'brands': Product.objects.values_list('brand', flat=True).distinct(),
+        'all_pro': all_pro
     })
 
 
-def product_detail(request, slug):
-    product = get_object_or_404(Product.objects.select_related('category'), slug=slug)
+def product_detail(request, model, slug):
+    ct = ContentType.objects.get(app_label='shop', model=model)
+    product = ct.get_object_for_this_type(slug=slug)
     return render(request, 'detail.html', {'product': product})
 
 def add_to_cart(request):

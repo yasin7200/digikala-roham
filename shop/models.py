@@ -8,11 +8,15 @@ class Category(models.Model):
         return self.title
 
 
+class ImageProduct(models.Model):
+    image = models.ImageField(upload_to='images/product')
+
+
 class Product(models.Model):
     category = models.ForeignKey(Category, on_delete=models.PROTECT)
     title = models.CharField(max_length=100)
     brand = models.CharField(max_length=100)
-    image = models.ImageField(upload_to='images/products')
+    image = models.ManyToManyField(ImageProduct)
     price = models.PositiveIntegerField()
     seller = models.CharField(max_length=100)
     weight = models.PositiveSmallIntegerField(null=True, blank=True)
