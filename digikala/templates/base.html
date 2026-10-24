@@ -71,6 +71,21 @@
             <span class="icon">👤</span>
             <span>پروفایل</span>
           </a>
+          {% if user.is_staff or user.is_superuser %}
+          <a href="{% url 'manage' %}" class="nav-action-btn">
+            <span class="icon">⚙️</span>
+            <span>پنل مدیریت</span>
+          </a>
+          {% else %}
+          {% for group in user.groups.all %}
+            {% if group.name == 'manager' %}
+            <a href="{% url 'manage' %}" class="nav-action-btn">
+              <span class="icon">⚙️</span>
+              <span>پنل مدیریت</span>
+            </a>
+            {% endif %}
+          {% endfor %}
+          {% endif %}
         {% else %}
           <a href="{% url 'login' %}" class="nav-action-btn">
             <span class="icon">👤</span>
