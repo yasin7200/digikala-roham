@@ -8,6 +8,18 @@ def pro_view(request):
     all_pro = Product.objects.select_related('category').all()
     categories = Category.objects.all()
     brands = Product.objects.values_list('brand', flat=True).distinct()
+
+    q = request.GET.get('q')
+    category_id = request.GET.get('category')
+    brand = request.GET.get('brand')
+
+    if q:
+        all_pro = all_pro.filter(title__icontains=q)
+    if category_id:
+        all_pro = all_pro.filter(category_id=category_id)
+    if brand:
+        all_pro = all_pro.filter(brand=brand)
+
     return render(request, 'products.html', {
         'all_pro': all_pro,
         'categories': categories,

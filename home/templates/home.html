@@ -3,360 +3,6 @@
 
 {% block title %}صفحه اصلی | فروشگاه{% endblock %}
 
-{% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/products.css' %}" />
-<style>
-  /* ========== HOME PAGE ========== */
-  .home-wrap {
-    max-width: 1440px;
-    margin: 0 auto;
-    padding: 20px 24px 40px;
-  }
-
-  /* Hero Banner */
-  .hero {
-    display: grid;
-    grid-template-columns: 1fr 280px;
-    gap: 16px;
-    margin-bottom: 28px;
-  }
-
-  .hero-main {
-    background: linear-gradient(135deg, #0d9488 0%, #14b8a6 50%, #2dd4bf 100%);
-    border-radius: 12px;
-    min-height: 280px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 40px;
-    color: #fff;
-    overflow: hidden;
-    position: relative;
-  }
-
-  .hero-main h1 {
-    font-size: 28px;
-    font-weight: 700;
-    margin-bottom: 12px;
-    line-height: 1.4;
-  }
-
-  .hero-main p {
-    font-size: 15px;
-    opacity: 0.95;
-    margin-bottom: 20px;
-    max-width: 360px;
-  }
-
-  .hero-btn {
-    display: inline-block;
-    background: #fff;
-    color: #0d9488;
-    padding: 10px 24px;
-    border-radius: 8px;
-    font-weight: 600;
-    font-size: 14px;
-    transition: transform 0.2s, box-shadow 0.2s;
-  }
-
-  .hero-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-  }
-
-  .hero-side {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
-
-  .hero-card {
-    flex: 1;
-    background: var(--dk-white);
-    border-radius: 12px;
-    padding: 20px;
-    box-shadow: var(--shadow);
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    transition: box-shadow 0.2s;
-  }
-
-  .hero-card:hover {
-    box-shadow: var(--shadow-hover);
-  }
-
-  .hero-card h3 {
-    font-size: 15px;
-    margin-bottom: 6px;
-    color: var(--dk-dark);
-  }
-
-  .hero-card p {
-    font-size: 12px;
-    color: var(--dk-gray);
-  }
-
-  .hero-card .badge {
-    display: inline-block;
-    background: var(--primary-light);
-    color: var(--primary);
-    font-size: 11px;
-    font-weight: 600;
-    padding: 3px 8px;
-    border-radius: 4px;
-    margin-top: 8px;
-    width: fit-content;
-  }
-
-  /* Categories */
-  .section-title {
-    font-size: 18px;
-    font-weight: 700;
-    margin-bottom: 16px;
-    color: var(--dk-dark);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-
-  .section-title a {
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--primary);
-  }
-
-  .section-title a:hover {
-    text-decoration: underline;
-  }
-
-  .cat-grid {
-    display: grid;
-    grid-template-columns: repeat(6, 1fr);
-    gap: 12px;
-    margin-bottom: 32px;
-  }
-
-  .cat-card {
-    background: var(--dk-white);
-    border-radius: 12px;
-    padding: 20px 12px;
-    text-align: center;
-    box-shadow: var(--shadow);
-    transition: transform 0.2s, box-shadow 0.2s;
-    cursor: pointer;
-  }
-
-  .cat-card:hover {
-    transform: translateY(-3px);
-    box-shadow: var(--shadow-hover);
-  }
-
-  .cat-icon {
-    width: 56px;
-    height: 56px;
-    margin: 0 auto 10px;
-    background: var(--primary-light);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 24px;
-  }
-
-  .cat-card h4 {
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--dk-dark);
-  }
-
-  /* Product row (amazing offers style) */
-  .product-row {
-    margin-bottom: 32px;
-  }
-
-  .product-row-header {
-    background: linear-gradient(90deg, #0d9488, #14b8a6);
-    border-radius: 12px 12px 0 0;
-    padding: 14px 20px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    color: #fff;
-  }
-
-  .product-row-header h2 {
-    font-size: 16px;
-    font-weight: 700;
-  }
-
-  .product-row-header a {
-    font-size: 13px;
-    color: #fff;
-    opacity: 0.9;
-  }
-
-  .product-row-header a:hover {
-    opacity: 1;
-    text-decoration: underline;
-  }
-
-  .product-row-body {
-    background: var(--dk-white);
-    border-radius: 0 0 12px 12px;
-    box-shadow: var(--shadow);
-    padding: 16px;
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 12px;
-  }
-
-  .home-product-card {
-    border: 1px solid var(--dk-border);
-    border-radius: 8px;
-    padding: 12px;
-    transition: box-shadow 0.2s, transform 0.2s;
-    display: flex;
-    flex-direction: column;
-  }
-
-  .home-product-card:hover {
-    box-shadow: var(--shadow-hover);
-    transform: translateY(-2px);
-  }
-
-  .home-product-img {
-    height: 120px;
-    background: #f5f5f5;
-    border-radius: 6px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--dk-gray);
-    font-size: 12px;
-    margin-bottom: 10px;
-  }
-
-  .home-product-title {
-    font-size: 12px;
-    font-weight: 500;
-    height: 36px;
-    overflow: hidden;
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    margin-bottom: 6px;
-  }
-
-  .home-product-price {
-    font-size: 14px;
-    font-weight: 700;
-    color: var(--dk-dark);
-    margin-top: auto;
-  }
-
-  .home-product-price span {
-    font-size: 11px;
-    font-weight: 400;
-    color: var(--dk-gray);
-  }
-
-  .home-product-rate {
-    font-size: 11px;
-    color: var(--dk-gray);
-    margin-bottom: 4px;
-  }
-
-  .home-product-rate .stars {
-    color: #f9bc00;
-  }
-
-  /* Banner strip */
-  .banner-strip {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
-    margin-bottom: 32px;
-  }
-
-  .banner-item {
-    border-radius: 12px;
-    min-height: 120px;
-    padding: 28px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    color: #fff;
-  }
-
-  .banner-item.teal {
-    background: linear-gradient(135deg, #0f766e, #0d9488);
-  }
-
-  .banner-item.cyan {
-    background: linear-gradient(135deg, #0891b2, #06b6d4);
-  }
-
-  .banner-item h3 {
-    font-size: 18px;
-    margin-bottom: 6px;
-  }
-
-  .banner-item p {
-    font-size: 13px;
-    opacity: 0.9;
-  }
-
-  @media (max-width: 1100px) {
-    .product-row-body {
-      grid-template-columns: repeat(3, 1fr);
-    }
-    .cat-grid {
-      grid-template-columns: repeat(4, 1fr);
-    }
-  }
-
-  @media (max-width: 900px) {
-    .hero {
-      grid-template-columns: 1fr;
-    }
-    .hero-side {
-      flex-direction: row;
-    }
-    .product-row-body {
-      grid-template-columns: repeat(2, 1fr);
-    }
-    .cat-grid {
-      grid-template-columns: repeat(3, 1fr);
-    }
-  }
-
-  @media (max-width: 480px) {
-    .home-wrap {
-      padding: 12px;
-    }
-    .hero-main {
-      padding: 24px;
-      min-height: 200px;
-    }
-    .hero-main h1 {
-      font-size: 20px;
-    }
-    .hero-side {
-      flex-direction: column;
-    }
-    .cat-grid {
-      grid-template-columns: repeat(2, 1fr);
-    }
-    .banner-strip {
-      grid-template-columns: 1fr;
-    }
-    .product-row-body {
-      grid-template-columns: 1fr 1fr;
-    }
-  }
-</style>
-{% endblock %}
-
 {% block content %}
 <div class="home-wrap">
 
@@ -431,7 +77,7 @@
     <div class="product-row-body">
       {% for product in featured_products %}
       <a href="{% url 'products' %}" class="home-product-card">
-        <div class="home-product-img">بدون تصویر</div>
+        <img src="{{ product.image.url }}" alt="بدون تصویر">
         <h3 class="home-product-title">{{ product.title }}</h3>
         <div class="home-product-rate">
           <span class="stars">★</span> {{ product.rate }}
@@ -442,31 +88,31 @@
       </a>
       {% empty %}
       <a href="{% url 'products' %}" class="home-product-card">
-        <div class="home-product-img">بدون تصویر</div>
+        <img src="{{ product.image.url }}" alt="بدون تصویر">
         <h3 class="home-product-title">گوشی موبایل سامسونگ Galaxy A55</h3>
         <div class="home-product-rate"><span class="stars">★</span> ۴.۵</div>
         <div class="home-product-price">۲۳,۱۲۰,۰۰۰ <span>تومان</span></div>
       </a>
       <a href="{% url 'products' %}" class="home-product-card">
-        <div class="home-product-img">بدون تصویر</div>
+        <img src="{{ product.image.url }}" alt="بدون تصویر">
         <h3 class="home-product-title">گوشی اپل iPhone 15 Pro Max</h3>
         <div class="home-product-rate"><span class="stars">★</span> ۴.۸</div>
         <div class="home-product-price">۸۹,۵۰۰,۰۰۰ <span>تومان</span></div>
       </a>
       <a href="{% url 'products' %}" class="home-product-card">
-        <div class="home-product-img">بدون تصویر</div>
+        <img src="{{ product.image.url }}" alt="بدون تصویر">
         <h3 class="home-product-title">شیائومی 14 Ultra</h3>
         <div class="home-product-rate"><span class="stars">★</span> ۴.۳</div>
         <div class="home-product-price">۳۸,۲۵۰,۰۰۰ <span>تومان</span></div>
       </a>
       <a href="{% url 'products' %}" class="home-product-card">
-        <div class="home-product-img">بدون تصویر</div>
+        <img src="{{ product.image.url }}" alt="بدون تصویر">
         <h3 class="home-product-title">سامسونگ Galaxy S24 Ultra</h3>
         <div class="home-product-rate"><span class="stars">★</span> ۴.۷</div>
         <div class="home-product-price">۶۲,۹۰۰,۰۰۰ <span>تومان</span></div>
       </a>
       <a href="{% url 'products' %}" class="home-product-card">
-        <div class="home-product-img">بدون تصویر</div>
+        <img src="{{ product.image.url }}" alt="بدون تصویر">
         <h3 class="home-product-title">Redmi Note 13 Pro</h3>
         <div class="home-product-rate"><span class="stars">★</span> ۴.۲</div>
         <div class="home-product-price">۱۱,۹۲۵,۰۰۰ <span>تومان</span></div>
@@ -496,7 +142,7 @@
     {% for product in latest_products %}
     <article class="product-card">
       <div class="product-img-wrap">
-        <div class="product-placeholder">بدون تصویر</div>
+        <img src="{{ product.image.url }}" alt="بدون تصویر">
       </div>
       <div class="product-body">
         <h3 class="product-title">{{ product.title }}</h3>
