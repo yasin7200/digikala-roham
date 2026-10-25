@@ -15,7 +15,7 @@ def is_manager(user):
 
 @user_passes_test(is_manager, login_url='login')
 def manage_view(request):
-    # ---------- User statistics ----------
+    
     total_users = User.objects.count()
     active_users = User.objects.filter(is_active=True).count()
     staff_users = User.objects.filter(is_staff=True).count()
@@ -23,23 +23,23 @@ def manage_view(request):
         groups__name='customer'
     ).distinct().count()
 
-    # Recently joined users (latest 5)
+
     recent_users = User.objects.order_by('-date_join')[:5]
 
-    # ---------- Product / catalogue statistics ----------
+
     total_products = Product.objects.count()
     total_categories = Category.objects.count()
 
-    # Stock health
+    
     low_stock_products = Product.objects.filter(
         counts__gte=1, counts__lte=5
     ).order_by('counts')[:5]
     out_of_stock_products = Product.objects.filter(counts=0)[:5]
 
-    # Categories with product counts
+    
     categories_with_counts = Category.objects.all()
 
-    # Top rated products
+    
     top_rated_products = Product.objects.order_by('-rate')[:5]
 
     context = {
