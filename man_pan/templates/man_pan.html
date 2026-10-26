@@ -1,0 +1,688 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}پنل مدیریت | فروشگاه{% endblock %}
+
+{% block extra_css %}
+<style>
+  /* ========== MANAGEMENT PANEL ========== */
+  .manage-wrap {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 24px 24px 48px;
+  }
+
+  .manage-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 32px;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+
+  .manage-header h1 {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--dk-dark);
+  }
+
+  .manage-header p {
+    font-size: 14px;
+    color: var(--dk-gray);
+  }
+
+  /* Stats cards row */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+
+  .stat-card {
+    background: var(--dk-white);
+    border-radius: 14px;
+    box-shadow: var(--shadow);
+    padding: 20px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border: 1px solid var(--dk-border);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+
+  .stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-hover);
+  }
+
+  .stat-card .stat-body .label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--dk-gray);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    margin-bottom: 6px;
+    display: block;
+  }
+
+  .stat-card .stat-body .value {
+    font-size: 30px;
+    font-weight: 800;
+    color: var(--dk-dark);
+    line-height: 1;
+  }
+
+  .stat-card .stat-icon {
+    font-size: 32px;
+    opacity: 0.15;
+  }
+
+  .stat-card.primary .value { color: var(--primary); }
+  .stat-card.primary .stat-icon { color: var(--primary); }
+  .stat-card.success .value { color: var(--dk-green); }
+  .stat-card.success .stat-icon { color: var(--dk-green); }
+  .stat-card.warning .value { color: #f59e0b; }
+  .stat-card.warning .stat-icon { color: #f59e0b; }
+  .stat-card.danger .value { color: #ef4056; }
+  .stat-card.danger .stat-icon { color: #ef4056; }
+
+  /* Section cards */
+  .section-card {
+    background: var(--dk-white);
+    border-radius: 14px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--dk-border);
+    margin-bottom: 24px;
+    overflow: hidden;
+  }
+
+  .section-header {
+    background: #f8f9fa;
+    border-bottom: 1px solid var(--dk-border);
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .section-header h2 {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--dk-dark);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .section-header .section-actions {
+    display: flex;
+    gap: 8px;
+  }
+
+  .btn-sm {
+    height: 32px;
+    padding: 0 14px;
+    border-radius: 8px;
+    border: 1px solid var(--dk-border);
+    background: var(--dk-white);
+    color: var(--dk-dark);
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-sm:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+  }
+
+  .btn-sm.primary {
+    background: var(--primary);
+    color: #fff;
+    border-color: var(--primary);
+  }
+
+  .btn-sm.primary:hover {
+    background: var(--primary-dark);
+  }
+
+  .btn-sm.danger {
+    background: #fef2f2;
+    color: #dc2626;
+    border-color: #fecaca;
+  }
+
+  .btn-sm.danger:hover {
+    background: #fecaca;
+  }
+
+  /* Tables */
+  .table-wrap {
+    overflow-x: auto;
+    padding: 0 24px 24px;
+  }
+
+  table.manage-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  table.manage-table thead th {
+    text-align: right;
+    padding: 12px 16px;
+    color: var(--dk-gray);
+    font-weight: 600;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    border-bottom: 2px solid var(--dk-border);
+    background: #fafafa;
+  }
+
+  table.manage-table tbody td {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--dk-border);
+    color: var(--dk-dark);
+    vertical-align: middle;
+  }
+
+  table.manage-table tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  table.manage-table tbody tr:hover {
+    background: #f8fffe;
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    white-space: nowrap;
+  }
+
+  .badge.active {
+    background: #ecfdf5;
+    color: #059669;
+  }
+
+  .badge.inactive {
+    background: #fef2f2;
+    color: #dc2626;
+  }
+
+  .badge.staff {
+    background: #eff6ff;
+    color: #2563eb;
+  }
+
+  .badge.customer {
+    background: #f8fffe;
+    color: var(--primary);
+  }
+
+  .badge.low-stock {
+    background: #fef3c7;
+    color: #b45309;
+  }
+
+  .badge.out-of-stock {
+    background: #fecaca;
+    color: #dc2626;
+  }
+
+  .avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--primary-light);
+    color: var(--primary-dark);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+
+  .avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+  }
+
+  .user-row-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .user-row-info .name {
+    font-weight: 600;
+    color: var(--dk-dark);
+  }
+
+  .user-row-info .email {
+    font-size: 12px;
+    color: var(--dk-gray);
+    display: block;
+    margin-top: 2px;
+  }
+
+  .product-row-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .product-thumb {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    background: #f0f0f1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--dk-gray);
+    font-size: 12px;
+    flex-shrink: 0;
+  }
+
+  .product-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 8px;
+  }
+
+  .product-row-info .title {
+    font-weight: 600;
+    color: var(--dk-dark);
+  }
+
+  .product-row-info .meta {
+    font-size: 12px;
+    color: var(--dk-gray);
+    display: block;
+    margin-top: 2px;
+  }
+
+  .count-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    background: #e0e0e2;
+    color: var(--dk-dark);
+  }
+
+  .empty-state {
+    background: var(--dk-white);
+    border-radius: 14px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--dk-border);
+    padding: 48px 24px;
+    text-align: center;
+    color: var(--dk-gray);
+  }
+
+  .empty-state h3 {
+    font-size: 16px;
+    color: var(--dk-dark);
+    margin-bottom: 6px;
+  }
+
+  /* Two-column grid for sections */
+  .sections-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+
+  @media (max-width: 900px) {
+    .stats-row {
+      grid-template-columns: 1fr 1fr;
+    }
+    .sections-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 600px) {
+    .stats-row {
+      grid-template-columns: 1fr;
+    }
+    .manage-wrap {
+      padding: 16px 12px 32px;
+    }
+    .stat-card {
+      padding: 16px 20px;
+    }
+    .stat-card .value {
+      font-size: 24px;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="manage-wrap">
+
+  <!-- Header -->
+  <div class="manage-header">
+    <div>
+      <h1>📊 پنل مدیریت</h1>
+      <p>نمایشگاه کلی از وضعیت کاربران، محصولات و دسته‌بندی‌ها</p>
+    </div>
+    <a href="{% url 'home' %}" class="btn-sm primary">بازگشت به فروشگاه</a>
+  </div>
+
+  <!-- Statistics cards -->
+  <div class="stats-row">
+    <div class="stat-card primary">
+      <div class="stat-body">
+        <span class="label">کل کاربران</span>
+        <span class="value">{{ total_users }}</span>
+      </div>
+      <div class="stat-icon">👥</div>
+    </div>
+    <div class="stat-card success">
+      <div class="stat-body">
+        <span class="label">مشتریان فعال</span>
+        <span class="value">{{ customer_users }}</span>
+      </div>
+      <div class="stat-icon">🛍️</div>
+    </div>
+    <div class="stat-card staff">
+      <div class="stat-body">
+        <span class="label">مدیران و کارکنان</span>
+        <span class="value">{{ staff_users }}</span>
+      </div>
+      <div class="stat-icon">👨‍💼</div>
+    </div>
+    <div class="stat-card danger">
+      <div class="stat-body">
+        <span class="label">محصولات ناموجود</span>
+        <span class="value">{{ out_of_stock_products|length }}</span>
+      </div>
+      <div class="stat-icon">⚠️</div>
+    </div>
+  </div>
+
+  <!-- Main content grid -->
+  <div class="sections-grid">
+
+    <!-- Recent users -->
+    <div class="section-card">
+      <div class="section-header">
+        <h2>🕒 آخرین کاربران ثبت‌نام‌شده</h2>
+        <a href="{% url 'profile' %}" class="btn-sm">مشاهده همه</a>
+      </div>
+      <div class="table-wrap">
+        {% if recent_users %}
+        <table class="manage-table">
+          <thead>
+            <tr>
+              <th>کاربر</th>
+              <th>ایمیل</th>
+              <th>نقش</th>
+              <th>تاریخ عضویت</th>
+              <th>وضعیت</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for user in recent_users %}
+            <tr>
+              <td>
+                <div class="user-row-info">
+                  <div class="avatar">{{ user.first_name|first|default:"U" }}</div>
+                  <div>
+                    <span class="name">{{ user.get_full_name|default:user.username }}</span>
+                    <span class="email">{{ user.email }}</span>
+                  </div>
+                </div>
+              </td>
+              <td>{{ user.email }}</td>
+              <td>
+                {% if user.is_superuser %}
+                  <span class="badge staff">سوپرکاربر</span>
+                {% elif user.is_staff %}
+                  <span class="badge staff">مدیر</span>
+                {% else %}
+                  <span class="badge customer">مشتری</span>
+                {% endif %}
+              </td>
+              <td>{{ user.date_join|date:"Y/m/d" }}</td>
+              <td>
+                {% if user.is_active %}
+                  <span class="badge active">فعال</span>
+                {% else %}
+                  <span class="badge inactive">غیرفعال</span>
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% else %}
+        <div class="empty-state">
+          <h3>هنوز کاربری ثبت نشده است</h3>
+          <p>لیستی از کاربران برای نمایش وجود ندارد.</p>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Low stock alert -->
+    <div class="section-card">
+      <div class="section-header">
+        <h2>📦 هشدار موجودی پایین</h2>
+        <a href="{% url 'products' %}" class="btn-sm">مشاهده محصولات</a>
+      </div>
+      <div class="table-wrap">
+        {% if low_stock_products %}
+        <table class="manage-table">
+          <thead>
+            <tr>
+              <th>محصول</th>
+              <th>دسته‌بندی</th>
+              <th>موجودی</th>
+              <th>قیمت</th>
+              <th>فروشنده</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for product in low_stock_products %}
+            <tr>
+              <td>
+                <div class="product-row-info">
+                  <div class="product-thumb">
+                    {% if product.image %}<img src="{{ product.image.url }}" alt="{{ product.title }}">{% else %}بدون تصویر{% endif %}
+                  </div>
+                  <div>
+                    <span class="title">{{ product.title }}</span>
+                    <span class="meta">{{ product.brand }}</span>
+                  </div>
+                </div>
+              </td>
+              <td>{{ product.category.title }}</td>
+              <td><span class="badge low-stock">{{ product.counts }} عدد</span></td>
+              <td>{{ product.price }} تومان</td>
+              <td>{{ product.seller }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% else %}
+        <div class="empty-state">
+          <h3>هیچ هشدار موجودی نیست</h3>
+          <p>تمام محصولات موجودی مناسبی دارند.</p>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Out of stock -->
+    <div class="section-card">
+      <div class="section-header">
+        <h2>❌ محصولات ناموجود</h2>
+        <a href="{% url 'products' %}" class="btn-sm danger">مدیریت موجودی</a>
+      </div>
+      <div class="table-wrap">
+        {% if out_of_stock_products %}
+        <table class="manage-table">
+          <thead>
+            <tr>
+              <th>محصول</th>
+              <th>دسته‌بندی</th>
+              <th>وضعیت</th>
+              <th>قیمت</th>
+              <th>فروشنده</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for product in out_of_stock_products %}
+            <tr>
+              <td>
+                <div class="product-row-info">
+                  <div class="product-thumb">
+                    {% if product.image %}<img src="{{ product.image.url }}" alt="{{ product.title }}">{% else %}بدون تصویر{% endif %}
+                  </div>
+                  <div>
+                    <span class="title">{{ product.title }}</span>
+                    <span class="meta">{{ product.brand }}</span>
+                  </div>
+                </div>
+              </td>
+              <td>{{ product.category.title }}</td>
+              <td><span class="badge out-of-stock">ناموجود</span></td>
+              <td>{{ product.price }} تومان</td>
+              <td>{{ product.seller }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% else %}
+        <div class="empty-state">
+          <h3>همه محصولات موجودی دارند</h3>
+          <p>خوشحالیم! هیچ محصولی ناموجود نیست.</p>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Top rated products -->
+    <div class="section-card">
+      <div class="section-header">
+        <h2>⭐ پربازدیدترین محصولات</h2>
+        <a href="{% url 'products' %}" class="btn-sm">مشاهده همه</a>
+      </div>
+      <div class="table-wrap">
+        {% if top_rated_products %}
+        <table class="manage-table">
+          <thead>
+            <tr>
+              <th>محصول</th>
+              <th>رتبه</th>
+              <th>دسته‌بندی</th>
+              <th>موجودی</th>
+              <th>قیمت</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for product in top_rated_products %}
+            <tr>
+              <td>
+                <div class="product-row-info">
+                  <div class="product-thumb">
+                    {% if product.image %}<img src="{{ product.image.url }}" alt="{{ product.title }}">{% else %}بدون تصویر{% endif %}
+                  </div>
+                  <div>
+                    <span class="title">{{ product.title }}</span>
+                    <span class="meta">{{ product.brand }}</span>
+                  </div>
+                </div>
+              </td>
+              <td>{{ product.rate }}</td>
+              <td>{{ product.category.title }}</td>
+              <td><span class="count-badge">{{ product.counts }} عدد</span></td>
+              <td>{{ product.price }} تومان</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% else %}
+        <div class="empty-state">
+          <h3>هنوز محصولی ثبت نشده است</h3>
+          <p>لیستی از محصولات برای نمایش وجود ندارد.</p>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Summary overview (full width) -->
+  <div class="section-card">
+    <div class="section-header">
+      <h2>📈 خلاصه دسته‌بندی‌ها</h2>
+    </div>
+    <div class="table-wrap">
+      {% if categories_with_counts %}
+      <table class="manage-table">
+        <thead>
+          <tr>
+            <th>دسته‌بندی</th>
+            <th>تعداد محصولات</th>
+            <th>شرایط موجودی</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for cat in categories_with_counts %}
+          {% with cat.product_set.count as prod_count %}
+          <tr>
+            <td>{{ cat.title }}</td>
+            <td><span class="count-badge">{{ prod_count }} محصول</span></td>
+            <td>
+              {% if prod_count == 0 %}
+                <span class="badge inactive">بدون محصول</span>
+              {% else %}
+                <span class="badge active">فعال</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% endwith %}
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <div class="empty-state">
+        <h3>هیچ دسته‌بندی ثبت نشده است</h3>
+        <p>از طریق پنل ادمین دسته‌بندی جدید اضافه کنید.</p>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // No extra JS needed for the management panel dashboard
+</script>
+{% endblock %}
