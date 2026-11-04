@@ -1,63 +1,35 @@
-from django.shortcuts import render, redirect
-from django.views.decorators.http import require_POST
-from .models import Product, Category
-from .cart import Cart
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib.contenttypes.models import ContentType
+from .models import Product, Category, Monitor, PC
 
+shop_models = {'monitor': Monitor, 'pc': PC}
 
-def pro_view(request):
-    all_pro = Product.objects.select_related('category').all()
+def pro_view(request, model=None):
+    if model:
+        ct = ContentType.objects.get(app_label='shop', model=model)
+        # OR
+        # ct = ContentType.objects.get_for_model(shop_models.get(model))
+        #------------------------------------------------------------------
+        # filterd_products = ct.get_all_objects_for_this_type(brand='brand')
+        #OR
+        all_pro = ct.model_class().objects.all()
+        #OR
+        # all_pro = ct.model_class()._default_manager.all()
+    else:
+        all_pro = Product.objects.all()
+
     categories = Category.objects.all()
-    brands = Product.objects.values_list('brand', flat=True).distinct()
-
-    q = request.GET.get('q')
-    category_id = request.GET.get('category')
-    brand = request.GET.get('brand')
-
-    if q:
-        all_pro = all_pro.filter(title__icontains=q)
-    if category_id:
-        all_pro = all_pro.filter(category_id=category_id)
-    if brand:
-        all_pro = all_pro.filter(brand=brand)
 
     return render(request, 'products.html', {
         'all_pro': all_pro,
         'categories': categories,
-        'brands': brands,
     })
 
 
-def cart_detail(request):
-    cart = Cart(request)
-    return render(request, 'cart.html', {
-        'items': cart.items(),
-        'total_price': cart.total_price(),
-        'total_items': cart.total_items(),
-    })
+def product_detail(request, model, slug):
+    ct = ContentType.objects.get(app_label='shop', model=model)
+    product = ct.get_object_for_this_type(slug=slug)
+    return render(request, 'detail.html', {'product': product})
 
-def product_detail_view(request, slg):
-    product = Product.objects.get(slug=slg)
-    return render(request, 'detail.html', {'product':product})
-
-@require_POST
-def cart_add(request, product_id):
-    Cart(request).add(product_id, request.POST.get('quantity', 1))
-    return redirect('cart')
-
-
-@require_POST
-def cart_update(request, item_id):
-    Cart(request).edit(item_id, request.POST.get('quantity', 1))
-    return redirect('cart')
-
-
-@require_POST
-def cart_remove(request, item_id):
-    Cart(request).delete(item_id)
-    return redirect('cart')
-
-
-@require_POST
-def cart_clear(request):
-    Cart(request).clear()
-    return redirect('cart')
+def add_to_cart(request):
+    pass

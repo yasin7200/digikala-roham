@@ -1,155 +1,94 @@
 {% extends 'base.html' %}
 {% load static %}
+
+{% block title %}محصولات | فروشگاه{% endblock %}
+
 {% block content %}
+<nav class="breadcrumb">
+  <a href="{% url 'products' %}">فروشگاه</a>
+  <span>/</span>
+  <span>همه محصولات</span>
+</nav>
 
-  <!-- Breadcrumb -->
-  <nav class="breadcrumb">
-    <a href="#">فروشگاه</a>
-    <span>/</span>
-    <span>همه محصولات</span>
-  </nav>
+<div class="main-container">
+  <button class="mobile-filter-btn" type="button" onclick="toggleSidebar()">فیلترها</button>
+  <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
 
-  <!-- Main -->
-  <div class="main-container">
-
-    <!-- Mobile Filter Button -->
-    <button class="mobile-filter-btn" type="button" onclick="toggleSidebar()">
-      ⚙️ فیلترها
-    </button>
-
-    <!-- Overlay -->
-    <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
-
-    <!-- Sidebar Filters -->
-    <aside class="sidebar" id="sidebar">
-      <div class="filter-section">
-        <div class="filter-title">دسته‌بندی</div>
-        <div class="filter-options">
-          {% for cat in categories %}
-            <label class="filter-option">
-              <input type="checkbox" name="category" value="{{ cat.id }}" />
-              {{ cat.title }}
-            </label>
-          {% empty %}
-            <label class="filter-option"><input type="checkbox" /> همه دسته‌ها</label>
-          {% endfor %}
-        </div>
-      </div>
-
-      <div class="filter-section">
-        <div class="filter-title">برند</div>
-        <div class="filter-options">
-          {% for brand in brands %}
-            <label class="filter-option">
-              <input type="checkbox" name="brand" value="{{ brand }}" />
-              {{ brand }}
-            </label>
-          {% empty %}
-            <label class="filter-option"><input type="checkbox" /> همه برندها</label>
-          {% endfor %}
-        </div>
-      </div>
-
-      <div class="filter-section">
-        <div class="filter-title">محدوده قیمت (تومان)</div>
-        <div class="price-range">
-          <input type="text" name="min_price" placeholder="از" />
-          <input type="text" name="max_price" placeholder="تا" />
-        </div>
-        <button class="price-btn" type="button">اعمال فیلتر قیمت</button>
-      </div>
-
-      <div class="filter-section">
-        <div class="filter-title">فقط کالاهای موجود</div>
-        <div class="filter-options">
-          <label class="filter-option">
-            <input type="checkbox" name="in_stock" value="1" />
-            فقط موجود
-          </label>
-        </div>
-      </div>
-    </aside>
-
-    <!-- Products Area -->
-    <section class="products-area">
-
-      <!-- Header: count + sort -->
-      <div class="products-header">
-        <div class="results-count">{{ all_pro|length }} کالا</div>
-        <div class="sort-options">
-          <span class="sort-label">مرتب‌سازی:</span>
-          <button class="sort-btn active" type="button" data-sort="rate">پربازدیدترین</button>
-          <button class="sort-btn" type="button" data-sort="price_asc">ارزان‌ترین</button>
-          <button class="sort-btn" type="button" data-sort="price_desc">گران‌ترین</button>
-          <button class="sort-btn" type="button" data-sort="newest">جدیدترین</button>
-        </div>
-      </div>
-
-      <!-- Product Grid -->
-      <div class="product-grid">
-        {% for product in all_pro %}
-          <article class="product-card">
-            <div class="product-img-wrap">
-                <a href="{% url 'product_detail' product.slug %}"><img src="{{ product.image.url }}" alt="{{ product.title }}"></a>
-            </div>
-            <div class="product-body">
-              <h3 class="product-title">{{ product.title }}</h3>
-              <div class="product-brand">{{ product.brand }}</div>
-              <div class="product-rating">
-                <span class="stars">
-                  {% if product.rate >= 4.5 %}★★★★★
-                  {% elif product.rate >= 3.5 %}★★★★☆
-                  {% elif product.rate >= 2.5 %}★★★☆☆
-                  {% elif product.rate >= 1.5 %}★★☆☆☆
-                  {% else %}★☆☆☆☆
-                  {% endif %}
-                </span>
-                <span>({{ product.rate }})</span>
-              </div>
-              <div class="product-price-area">
-                <div class="current-price">
-                  <div class="price">
-                    {{ product.price }} <span>تومان</span>
-                  </div>
-                </div>
-                <div class="product-meta">
-                  <span>فروشنده: {{ product.seller }}</span>
-                  <form action="{% url 'cart_add' product.id %}" method="post" class="add-to-cart-form">
-                    {% csrf_token %}
-                    <input type="hidden" name="quantity" value="1">
-                    <button type="submit" class="auth-btn secondary" {% if product.counts < 1 %}disabled{% endif %}>
-                      افزودن به سبد
-                    </button>
-                  </form>
-                  {% if product.counts > 1 %}
-                  {% else %}
-                    <span class="stock-low">ناموجود</span>
-                  {% endif %}
-                </div>  
-              </div>
-            </div>
-          </article>
-        {% empty %}
-          <div class="empty-state">
-            <h3>محصولی یافت نشد</h3>
-            <p>هنوز هیچ محصولی در فروشگاه ثبت نشده است.</p>
-          </div>
+  <aside class="sidebar" id="sidebar">
+    <div class="filter-section">
+      <div class="filter-title">دسته‌بندی</div>
+      <div class="filter-options">
+        <a href="{% url 'products' %}" class="filter-option">همه</a>
+        {% for cat in categories %}
+          <a href="{% url 'products' %}?category={{ cat.id }}" class="filter-option">{{ cat.title }}</a>
         {% endfor %}
-
       </div>
+    </div>
+  </aside>
 
-      <!-- Pagination (placeholder) -->
-      {% if all_pro %}
-      <div class="pagination">
-        <button class="page-btn" type="button" disabled>قبلی</button>
-        <button class="page-btn active" type="button">۱</button>
-        <button class="page-btn" type="button">بعدی</button>
-      </div>
-      {% endif %}
+  <section class="products-area">
+    <div class="products-header">
+      <div class="results-count">{{ all_pro|length }} کالا</div>
+    </div>
 
-    </section>
-  </div>
+    <div class="product-grid">
+      {% for product in all_pro %}
+        <article class="product-card">
+          <a href="{% url 'product_detail' product.slug %}">
+            <div class="product-img-wrap">
+              {% if product.image %}
+                <img src="{{ product.image.url }}" alt="{{ product.title }}">
+              {% else %}
+                <div class="product-placeholder">بدون تصویر</div>
+              {% endif %}
+            </div>
+          </a>
+          <div class="product-body">
+            <h3 class="product-title">
+              <a href="{% url 'product_detail' product.slug %}">{{ product.title }}</a>
+            </h3>
+            <div class="product-brand">{{ product.brand }}</div>
+            <div class="product-rating">
+              <span class="stars">
+                {% if product.rate >= 4.5 %}★★★★★
+                {% elif product.rate >= 3.5 %}★★★★☆
+                {% elif product.rate >= 2.5 %}★★★☆☆
+                {% elif product.rate >= 1.5 %}★★☆☆☆
+                {% else %}★☆☆☆☆
+                {% endif %}
+              </span>
+              <span>({{ product.rate }})</span>
+            </div>
+            <div class="product-price-area">
+              <div class="price">{{ product.price }} <span>تومان</span></div>
+              <div class="product-meta">
+                <span>{{ product.seller }}</span>
+                {% if product.counts > 0 %}
+                  <span class="stock-ok">موجود</span>
+                {% else %}
+                  <span class="stock-low">ناموجود</span>
+                {% endif %}
+              </div>
+              <form action="{% url 'cart_add' product.id %}" method="post" class="add-to-cart-form">
+                {% csrf_token %}
+                <button type="submit" class="add-to-cart-btn" {% if product.counts < 1 %}disabled{% endif %}>افزودن به سبد</button>
+              </form>
+            </div>
+          </div>
+        </article>
+      {% empty %}
+        <div class="empty-state">
+          <h3>محصولی یافت نشد</h3>
+        </div>
+      {% endfor %}
+    </div>
+  </section>
+</div>
 
+<script>
+  function toggleSidebar() {
+    document.getElementById('sidebar').classList.toggle('open');
+    document.getElementById('overlay').classList.toggle('show');
+  }
+</script>
 {% endblock %}
-
-

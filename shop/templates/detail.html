@@ -9,7 +9,7 @@
     <a href="{% url 'products' %}">محصولات</a>
     <span>/</span>
     {% if product.category %}
-      <a href="{% url 'products' %}?category={{ product.category.id }}">{{ product.category.title }}</a>
+      <span>{{ product.category.title }}</span>
       <span>/</span>
     {% endif %}
     <span>{{ product.title }}</span>
@@ -27,57 +27,34 @@
     <div class="detail-info">
       <div class="detail-brand">{{ product.brand }}</div>
       <h1 class="detail-title">{{ product.title }}</h1>
-
       <div class="product-rating">
-        <span class="stars">
-          {% if product.rate >= 4.5 %}★★★★★
-          {% elif product.rate >= 3.5 %}★★★★☆
-          {% elif product.rate >= 2.5 %}★★★☆☆
-          {% elif product.rate >= 1.5 %}★★☆☆☆
-          {% else %}★☆☆☆☆
-          {% endif %}
-        </span>
+        <span class="stars">★★★★★</span>
         <span>({{ product.rate }})</span>
       </div>
-
-      <div class="detail-price">
-        {{ product.price }} <span>تومان</span>
-      </div>
+      <div class="detail-price">{{ product.price }} <span>تومان</span></div>
 
       <ul class="detail-facts">
-        {% if product.category %}
-        <li><span>دسته‌بندی:</span><b>{{ product.category.title }}</b></li>
-        {% endif %}
-        <li><span>برند:</span><b>{{ product.brand }}</b></li>
-        <li><span>فروشنده:</span><b>{{ product.seller }}</b></li>
-        {% if product.color %}
-        <li><span>رنگ:</span><b>{{ product.color }}</b></li>
-        {% endif %}
-        {% if product.weight %}
-        <li><span>وزن:</span><b>{{ product.weight }} گرم</b></li>
-        {% endif %}
+        {% if product.category %}<li><span>دسته‌بندی</span><b>{{ product.category.title }}</b></li>{% endif %}
+        <li><span>برند</span><b>{{ product.brand }}</b></li>
+        <li><span>فروشنده</span><b>{{ product.seller }}</b></li>
+        {% if product.color %}<li><span>رنگ</span><b>{{ product.color }}</b></li>{% endif %}
+        {% if product.weight %}<li><span>وزن</span><b>{{ product.weight }} گرم</b></li>{% endif %}
         <li>
           <span>موجودی</span>
           {% if product.counts > 0 %}
-            <b class="stock-ok">موجود ({{ product.counts }} عدد)</b>
+            <b class="stock-ok">موجود ({{ product.counts }})</b>
           {% else %}
             <b class="stock-low">ناموجود</b>
           {% endif %}
         </li>
       </ul>
-    </div>
-  </div>
 
-  {% if product.description %}
-  <div class="detail-specs">
-    <h2>توضیحات کالا</h2>
-    <p class="detail-desc">{{ product.description|linebreaksbr }}</p>
-  </div>
-        <form action="{% url 'cart_add' product.id %}" method="post" class="detail-buy">
+      <form action="{% url 'cart_add' product.id %}" method="post" class="detail-buy">
         {% csrf_token %}
-        <input type="number" name="quantity" value="1" min="1" {% if product.counts %}max="{{ product.counts }}"{% endif %}>
+        <input type="number" name="quantity" value="1" min="1">
         <button type="submit" class="add-to-cart-btn" {% if product.counts < 1 %}disabled{% endif %}>افزودن به سبد</button>
       </form>
-  {% endif %}
+    </div>
+  </div>
 </div>
 {% endblock %}
