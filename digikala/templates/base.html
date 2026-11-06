@@ -9,6 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="{% static 'style.css' %}" />
+  <link rel="stylesheet" href="{% static 'home_refresh.css' %}" />
   {% block extra_css %}{% endblock %}
 </head>
 <body>
@@ -41,10 +42,7 @@
             {% for cat in categories %}
               <a href="{% url 'products' %}?category={{ cat.id }}" class="dropdown-item">{{ cat.title }}</a>
             {% empty %}
-              <a href="{% url 'products' %}" class="dropdown-item">همه دسته‌ها</a>
-              <a href="{% url 'products' %}" class="dropdown-item">موبایل</a>
-              <a href="{% url 'products' %}" class="dropdown-item">لپ‌تاپ</a>
-              <a href="{% url 'products' %}" class="dropdown-item">لوازم خانگی</a>
+              <span class="dropdown-item dropdown-empty">دسته‌بندی‌ای ثبت نشده است</span>
             {% endfor %}
           </div>
         </li>
@@ -57,9 +55,7 @@
             {% for brand in brands %}
               <a href="{% url 'products' %}?brand={{ brand }}" class="dropdown-item">{{ brand }}</a>
             {% empty %}
-              <a href="{% url 'products' %}" class="dropdown-item">سامسونگ</a>
-              <a href="{% url 'products' %}" class="dropdown-item">اپل</a>
-              <a href="{% url 'products' %}" class="dropdown-item">شیائومی</a>
+              <span class="dropdown-item dropdown-empty">برندی ثبت نشده است</span>
             {% endfor %}
           </div>
         </li>

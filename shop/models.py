@@ -8,15 +8,10 @@ class Category(models.Model):
         return self.title
 
 
-class ImageProduct(models.Model):
-    image = models.ImageField(upload_to='images/product')
-
-
 class Product(models.Model):
     category = models.ForeignKey(Category, on_delete=models.PROTECT)
     title = models.CharField(max_length=100)
     brand = models.CharField(max_length=100)
-    image = models.ManyToManyField(ImageProduct)
     price = models.PositiveIntegerField()
     seller = models.CharField(max_length=100)
     weight = models.PositiveSmallIntegerField(null=True, blank=True)
@@ -28,6 +23,16 @@ class Product(models.Model):
 
     def __str__(self):
         return self.title
+
+
+
+
+class ImageProduct(models.Model):
+    product = models.ForeignKey(Product,on_delete=models.CASCADE,related_name='images')
+    image = models.ImageField(upload_to='images/product')
+
+    def __str__(self):
+        return self.product.title
 
 
 class Phone(Product):

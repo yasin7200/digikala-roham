@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load product_filters %}
 
 {% block title %}محصولات | فروشگاه{% endblock %}
 
@@ -36,11 +37,13 @@
         <article class="product-card">
           <a href="{% url 'product_detail' product.slug %}">
             <div class="product-img-wrap">
-              {% if product.image %}
-                <img src="{{ product.image.url }}" alt="{{ product.title }}">
-              {% else %}
-                <div class="product-placeholder">بدون تصویر</div>
-              {% endif %}
+              {% with first_image=product.images.first %}
+                {% if first_image %}
+                  <img src="{{ first_image.image.url }}" alt="{{ product.title }}">
+                {% else %}
+                  <div class="product-placeholder">بدون تصویر</div>
+                {% endif %}
+              {% endwith %}
             </div>
           </a>
           <div class="product-body">
@@ -60,7 +63,7 @@
               <span>({{ product.rate }})</span>
             </div>
             <div class="product-price-area">
-              <div class="price">{{ product.price }} <span>تومان</span></div>
+              <div class="price">{{ product.price|price_comma }} <span>تومان</span></div>
               <div class="product-meta">
                 <span>{{ product.seller }}</span>
                 {% if product.counts > 0 %}

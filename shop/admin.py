@@ -1,214 +1,237 @@
+
 from django.contrib import admin
-from .models import (
-    Category,
-    Product,
-    Phone,
-    Tablet,
-    PC,
-    Monitor,
-    Laptop,
-    GamingLaptop,
-    Headphones,
-    Modem,
-    FlashDrive,
-    HardDrive,
-    HDD,
-    SSD,
-    ExternalHardDrive,
-    NVMeSSD,
-    GameConsole,
-    PowerBank,
-    Printer,
-    SmartWatch,
-    AppleWatch,
-    Mouse,
-    Keyboard,
-)
+from .models import *
 
 
+# نمایش تصاویر در صفحه محصول
+class ImageProductInline(admin.TabularInline):
+    model = ImageProduct
+    extra = 1
+    fields = ("image",)
+    show_change_link = True
 
+
+# تنظیمات مشترک تمام محصولات
+class BaseProductAdmin(admin.ModelAdmin):
+    inlines = [ImageProductInline]
+
+    list_display = (
+        "id",
+        "title",
+        "brand",
+        "price",
+        "discount",
+        "counts",
+    )
+
+    list_filter = ("brand", "category")
+    search_fields = ("title", "brand", "seller")
+    prepopulated_fields = {"slug": ("title",)}
+    list_per_page = 20
+
+
+# دسته‌بندی
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
-    list_display = ('id', 'title')
-    search_fields = ('title',)
+    list_display = ("id", "title")
+    search_fields = ("title",)
 
 
-
+# محصول اصلی
 @admin.register(Product)
-class ProductAdmin(admin.ModelAdmin):
-    list_display = ('id', 'title', 'brand', 'category', 'price', 'discount', 'counts', 'rate', 'seller')
-    list_filter = ('category', 'brand', 'seller')
-    search_fields = ('title', 'brand', 'slug', 'seller')
-    prepopulated_fields = {'slug': ('title',)}
-    list_editable = ('price', 'discount', 'counts')
+class ProductAdmin(BaseProductAdmin):
+    list_display = (
+        "id", "title", "brand", "category",
+        "price", "discount", "counts", "seller"
+    )
+    list_editable = ("price", "discount", "counts")
 
 
+# محصولات تخصصی
 @admin.register(Phone)
-class PhoneAdmin(admin.ModelAdmin):
-    list_display = ('id', 'title', 'brand', 'model', 'ram', 'internal_storage', 'price', 'counts')
-    list_filter = ('brand', 'os')
-    search_fields = ('title', 'brand', 'model')
-    prepopulated_fields = {'slug': ('title',)}
+class PhoneAdmin(BaseProductAdmin):
+    list_display = (
+        "id", "title", "brand", "model",
+        "ram", "internal_storage", "price"
+    )
+    list_filter = ("brand", "os")
 
 
 @admin.register(Tablet)
-class TabletAdmin(admin.ModelAdmin):
-    list_display = ('id', 'title', 'brand', 'model', 'screen_size', 'has_pen', 'price', 'counts')
-    list_filter = ('brand', 'has_pen', 'cellular')
-    search_fields = ('title', 'brand', 'model')
-    prepopulated_fields = {'slug': ('title',)}
-
+class TabletAdmin(BaseProductAdmin):
+    list_display = (
+        "id", "title", "brand", "model",
+        "screen_size", "has_pen", "price"
+    )
+    list_filter = ("brand", "has_pen", "cellular")
 
 
 @admin.register(PC)
-class PCAdmin(admin.ModelAdmin):
-    list_display = ('id', 'title', 'brand', 'cpu', 'ram', 'gpu', 'price', 'counts')
-    list_filter = ('brand', 'ram_type', 'storage_type')
-    search_fields = ('title', 'brand', 'cpu', 'gpu')
-    prepopulated_fields = {'slug': ('title',)}
+class PCAdmin(BaseProductAdmin):
+    list_display = (
+        "id", "title", "brand", "cpu",
+        "ram", "gpu", "price"
+    )
+    list_filter = ("brand", "ram_type", "storage_type")
 
 
 @admin.register(Monitor)
-class MonitorAdmin(admin.ModelAdmin):
-    list_display = ('id', 'title', 'brand', 'screen_size', 'screen_resolution', 'refresh_rate', 'price')
-    list_filter = ('brand', 'panel_type')
-    search_fields = ('title', 'brand')
-    prepopulated_fields = {'slug': ('title',)}
+class MonitorAdmin(BaseProductAdmin):
+    list_display = (
+        "id", "title", "brand", "screen_size",
+        "screen_resolution", "refresh_rate", "price"
+    )
+    list_filter = ("brand", "panel_type")
 
 
 @admin.register(Laptop)
-class LaptopAdmin(admin.ModelAdmin):
-    list_display = ('id', 'title', 'brand', 'cpu', 'ram', 'screen_size', 'price', 'counts')
-    list_filter = ('brand', 'touchscreen', 'convertible')
-    search_fields = ('title', 'brand', 'cpu')
-    prepopulated_fields = {'slug': ('title',)}
+class LaptopAdmin(BaseProductAdmin):
+    list_display = (
+        "id", "title", "brand", "cpu",
+        "ram", "screen_size", "price"
+    )
+    list_filter = ("brand", "touchscreen", "convertible")
 
 
 @admin.register(GamingLaptop)
-class GamingLaptopAdmin(admin.ModelAdmin):
-    list_display = ('id', 'title', 'brand', 'dedicated_gpu', 'cpu', 'ram', 'price', 'counts')
-    list_filter = ('brand', 'rgb_keyboard', 'mux_switch')
-    search_fields = ('title', 'brand', 'dedicated_gpu')
-    prepopulated_fields = {'slug': ('title',)}
+class GamingLaptopAdmin(BaseProductAdmin):
+    list_display = (
+        "id", "title", "brand", "dedicated_gpu",
+        "cpu", "ram", "price"
+    )
+    list_filter = ("brand", "rgb_keyboard", "mux_switch")
 
 
 @admin.register(Headphones)
-class HeadphonesAdmin(admin.ModelAdmin):
-    list_display = ('id', 'title', 'brand', 'model', 'connection_type', 'noise_cancellation', 'price')
-    list_filter = ('brand', 'connection_type', 'noise_cancellation', 'form_factor')
-    search_fields = ('title', 'brand', 'model')
-    prepopulated_fields = {'slug': ('title',)}
+class HeadphonesAdmin(BaseProductAdmin):
+    list_display = (
+        "id", "title", "brand", "model",
+        "connection_type", "price"
+    )
+    list_filter = ("brand", "connection_type", "noise_cancellation")
 
 
 @admin.register(Modem)
-class ModemAdmin(admin.ModelAdmin):
-    list_display = ('id', 'title', 'brand', 'model', 'modem_type', 'wifi_standard', 'price')
-    list_filter = ('brand', 'modem_type', 'sim_support')
-    search_fields = ('title', 'brand', 'model')
-    prepopulated_fields = {'slug': ('title',)}
+class ModemAdmin(BaseProductAdmin):
+    list_display = (
+        "id", "title", "brand", "model",
+        "modem_type", "wifi_standard", "price"
+    )
+    list_filter = ("brand", "modem_type", "sim_support")
 
 
 @admin.register(FlashDrive)
-class FlashDriveAdmin(admin.ModelAdmin):
-    list_display = ('id', 'title', 'brand', 'capacity', 'interface', 'read_speed', 'price')
-    list_filter = ('brand', 'interface', 'waterproof')
-    search_fields = ('title', 'brand', 'model')
-    prepopulated_fields = {'slug': ('title',)}
+class FlashDriveAdmin(BaseProductAdmin):
+    list_display = (
+        "id", "title", "brand", "capacity",
+        "interface", "read_speed", "price"
+    )
+    list_filter = ("brand", "interface", "waterproof")
 
 
 @admin.register(HardDrive)
-class HardDriveAdmin(admin.ModelAdmin):
-    list_display = ('id', 'title', 'brand', 'capacity', 'interface', 'form_factor', 'price')
-    list_filter = ('brand', 'interface', 'form_factor')
-    search_fields = ('title', 'brand', 'model')
-    prepopulated_fields = {'slug': ('title',)}
+class HardDriveAdmin(BaseProductAdmin):
+    list_display = (
+        "id", "title", "brand", "capacity",
+        "interface", "form_factor", "price"
+    )
+    list_filter = ("brand", "interface", "form_factor")
 
 
 @admin.register(HDD)
-class HDDAdmin(admin.ModelAdmin):
-    list_display = ('id', 'title', 'brand', 'capacity', 'rpm', 'form_factor', 'price')
-    list_filter = ('brand', 'rpm')
-    search_fields = ('title', 'brand', 'model')
-    prepopulated_fields = {'slug': ('title',)}
+class HDDAdmin(BaseProductAdmin):
+    list_display = (
+        "id", "title", "brand", "capacity",
+        "rpm", "form_factor", "price"
+    )
+    list_filter = ("brand", "rpm")
 
 
 @admin.register(SSD)
-class SSDAdmin(admin.ModelAdmin):
-    list_display = ('id', 'title', 'brand', 'capacity', 'nand_type', 'read_speed', 'price')
-    list_filter = ('brand', 'nand_type', 'pcie_generation')
-    search_fields = ('title', 'brand', 'model')
-    prepopulated_fields = {'slug': ('title',)}
+class SSDAdmin(BaseProductAdmin):
+    list_display = (
+        "id", "title", "brand", "capacity",
+        "nand_type", "read_speed", "price"
+    )
+    list_filter = ("brand", "nand_type", "pcie_generation")
 
 
 @admin.register(ExternalHardDrive)
-class ExternalHardDriveAdmin(admin.ModelAdmin):
-    list_display = ('id', 'title', 'brand', 'capacity', 'drive_type', 'connection', 'price')
-    list_filter = ('brand', 'drive_type', 'portable', 'waterproof')
-    search_fields = ('title', 'brand', 'model')
-    prepopulated_fields = {'slug': ('title',)}
+class ExternalHardDriveAdmin(BaseProductAdmin):
+    list_display = (
+        "id", "title", "brand", "capacity",
+        "drive_type", "connection", "price"
+    )
+    list_filter = ("brand", "drive_type", "portable")
 
 
 @admin.register(NVMeSSD)
-class NVMeSSDAdmin(admin.ModelAdmin):
-    list_display = ('id', 'title', 'brand', 'capacity', 'read_speed', 'heatsink', 'price')
-    list_filter = ('brand', 'pcie_generation', 'heatsink')
-    search_fields = ('title', 'brand', 'model')
-    prepopulated_fields = {'slug': ('title',)}
-
+class NVMeSSDAdmin(BaseProductAdmin):
+    list_display = (
+        "id", "title", "brand", "capacity",
+        "read_speed", "heatsink", "price"
+    )
+    list_filter = ("brand", "pcie_generation", "heatsink")
 
 
 @admin.register(GameConsole)
-class GameConsoleAdmin(admin.ModelAdmin):
-    list_display = ('id', 'title', 'brand', 'model', 'storage', 'resolution_support', 'price')
-    list_filter = ('brand', 'generation', 'ray_tracing')
-    search_fields = ('title', 'brand', 'model')
-    prepopulated_fields = {'slug': ('title',)}
+class GameConsoleAdmin(BaseProductAdmin):
+    list_display = (
+        "id", "title", "brand", "model",
+        "storage", "resolution_support", "price"
+    )
+    list_filter = ("brand", "generation", "ray_tracing")
 
 
 @admin.register(PowerBank)
-class PowerBankAdmin(admin.ModelAdmin):
-    list_display = ('id', 'title', 'brand', 'capacity', 'max_output_power', 'wireless_charging', 'price')
-    list_filter = ('brand', 'pd_support', 'wireless_charging')
-    search_fields = ('title', 'brand', 'model')
-    prepopulated_fields = {'slug': ('title',)}
+class PowerBankAdmin(BaseProductAdmin):
+    list_display = (
+        "id", "title", "brand", "capacity",
+        "max_output_power", "wireless_charging", "price"
+    )
+    list_filter = ("brand", "pd_support", "wireless_charging")
 
 
 @admin.register(Printer)
-class PrinterAdmin(admin.ModelAdmin):
-    list_display = ('id', 'title', 'brand', 'printer_type', 'color_printing', 'duplex_printing', 'price')
-    list_filter = ('brand', 'printer_type', 'color_printing', 'scanner')
-    search_fields = ('title', 'brand', 'model')
-    prepopulated_fields = {'slug': ('title',)}
+class PrinterAdmin(BaseProductAdmin):
+    list_display = (
+        "id", "title", "brand", "printer_type",
+        "color_printing", "duplex_printing", "price"
+    )
+    list_filter = ("brand", "printer_type", "color_printing")
 
 
 @admin.register(SmartWatch)
-class SmartWatchAdmin(admin.ModelAdmin):
-    list_display = ('id', 'title', 'brand', 'model', 'os', 'battery_life', 'price')
-    list_filter = ('brand', 'os', 'cellular')
-    search_fields = ('title', 'brand', 'model')
-    prepopulated_fields = {'slug': ('title',)}
+class SmartWatchAdmin(BaseProductAdmin):
+    list_display = (
+        "id", "title", "brand", "model",
+        "os", "battery_life", "price"
+    )
+    list_filter = ("brand", "os", "cellular")
 
 
 @admin.register(AppleWatch)
-class AppleWatchAdmin(admin.ModelAdmin):
-    list_display = ('id', 'title', 'series', 'chip', 'always_on_display', 'price', 'counts')
-    list_filter = ('series', 'ecg', 'titanium_case')
-    search_fields = ('title', 'series', 'model')
-    prepopulated_fields = {'slug': ('title',)}
-
+class AppleWatchAdmin(BaseProductAdmin):
+    list_display = (
+        "id", "title", "series", "chip",
+        "always_on_display", "price"
+    )
+    list_filter = ("series", "ecg", "titanium_case")
 
 
 @admin.register(Mouse)
-class MouseAdmin(admin.ModelAdmin):
-    list_display = ('id', 'title', 'brand', 'model', 'connection_type', 'dpi', 'price')
-    list_filter = ('brand', 'connection_type', 'rgb', 'ergonomic')
-    search_fields = ('title', 'brand', 'model')
-    prepopulated_fields = {'slug': ('title',)}
+class MouseAdmin(BaseProductAdmin):
+    list_display = (
+        "id", "title", "brand", "model",
+        "connection_type", "dpi", "price"
+    )
+    list_filter = ("brand", "connection_type", "rgb")
 
 
 @admin.register(Keyboard)
-class KeyboardAdmin(admin.ModelAdmin):
-    list_display = ('id', 'title', 'brand', 'model', 'keyboard_type', 'layout', 'price')
-    list_filter = ('brand', 'keyboard_type', 'rgb', 'backlight')
-    search_fields = ('title', 'brand', 'model')
-    prepopulated_fields = {'slug': ('title',)}
+class KeyboardAdmin(BaseProductAdmin):
+    list_display = (
+        "id", "title", "brand", "model",
+        "keyboard_type", "layout", "price"
+    )
+    list_filter = ("brand", "keyboard_type", "rgb")

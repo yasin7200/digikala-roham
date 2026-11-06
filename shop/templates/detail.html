@@ -1,60 +1,333 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load product_filters %}
 
 {% block title %}{{ product.title }}{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/detail.css' %}">
+{% endblock %}
+
 {% block content %}
-<div class="detail-page">
-  <nav class="breadcrumb">
-    <a href="{% url 'products' %}">محصولات</a>
-    <span>/</span>
-    {% if product.category %}
-      <span>{{ product.category.title }}</span>
-      <span>/</span>
+<div class="detail-page" dir="rtl">
+    <nav class="breadcrumb">
+        <a href="{% url 'products' %}">محصولات</a>
+        <span>/</span>
+        {% if product.category %}
+            <span>{{ product.category.title }}</span>
+            <span>/</span>
+        {% endif %}
+        <span>{{ product.title }}</span>
+    </nav>
+
+    <div class="detail-card">
+        <!-- گالری تصاویر محصول -->
+        <section class="detail-gallery" aria-label="گالری تصاویر محصول">
+            <div class="gallery-header">
+                <h3 class="gallery-title">گالری تصاویر</h3>
+                <span class="gallery-count" id="galleryCount">
+                    {% if images|length > 0 %}۱ از {{ images|length }}{% else %}۰ از ۰{% endif %}
+                </span>
+            </div>
+
+            <div class="gallery-main-wrap">
+                <div class="gallery-main" role="button" tabindex="0" aria-label="بزرگنمایی تصویر اصلی محصول">
+                    {% with first_image=images|first %}
+                        {% if first_image %}
+                            <img id="mainProductImage"
+                                 src="{{ first_image.image.url }}"
+                                 alt="{{ product.title }}"
+                                 loading="eager">
+                            <button type="button" class="gallery-zoom-btn" aria-label="بزرگنمایی تصویر اصلی" title="بزرگنمایی">
+                                🔍
+                            </button>
+                        {% else %}
+                            <div class="product-placeholder">تصویری برای این محصول ثبت نشده است</div>
+                        {% endif %}
+                    {% endwith %}
+                </div>
+
+                {% if images|length > 1 %}
+                    <div class="gallery-thumbnails-wrap">
+                        <button type="button" class="thumb-nav thumb-prev" id="thumbPrev" aria-label="تصاویر قبلی" disabled>‹</button>
+                        <div class="gallery-thumbnails">
+                            {% for item in images %}
+                                <button type="button"
+                                        class="gallery-thumb {% if forloop.first %}active{% endif %}"
+                                        data-image="{{ item.image.url }}"
+                                        data-index="{{ forloop.counter0 }}"
+                                        aria-label="نمایش تصویر {{ forloop.counter }}"
+                                        aria-pressed="{% if forloop.first %}true{% else %}false{% endif %}">
+                                    <img src="{{ item.image.url }}" alt="{{ product.title }} - تصویر {{ forloop.counter }}">
+                                </button>
+                            {% endfor %}
+                        </div>
+                        <button type="button" class="thumb-nav thumb-next" id="thumbNext" aria-label="تصاویر بعدی">›</button>
+                    </div>
+                {% endif %}
+            </div>
+        </section>
+
+        <!-- اطلاعات عمومی محصول -->
+        <section class="detail-info">
+            <div class="detail-brand">{{ product.brand }}</div>
+            <h1 class="detail-title">{{ product.title }}</h1>
+
+            <div class="product-rating">
+                <span class="stars">★★★★★</span>
+                <span>({{ product.rate }})</span>
+            </div>
+
+            <div class="detail-price">
+                {{ product.price|price_comma }} <span>تومان</span>
+            </div>
+
+            <ul class="detail-facts">
+                {% if product.category %}
+                    <li><span>دسته‌بندی</span><b>{{ product.category.title }}</b></li>
+                {% endif %}
+                <li><span>برند</span><b>{{ product.brand }}</b></li>
+                <li><span>فروشنده</span><b>{{ product.seller }}</b></li>
+                {% if product.color %}
+                    <li><span>رنگ</span><b>{{ product.color }}</b></li>
+                {% endif %}
+                {% if product.weight %}
+                    <li><span>وزن</span><b>{{ product.weight }} گرم</b></li>
+                {% endif %}
+                <li>
+                    <span>موجودی</span>
+                    {% if product.counts > 0 %}
+                        <b class="stock-ok">موجود ({{ product.counts }})</b>
+                    {% else %}
+                        <b class="stock-low">ناموجود</b>
+                    {% endif %}
+                </li>
+            </ul>
+
+            <div class="detail-buy">
+                <form action="{% url 'cart_add' product.id %}" method="post" class="buy-form">
+                    {% csrf_token %}
+                    <input type="number" name="quantity" value="1" min="1"
+                           max="{{ product.counts }}" aria-label="تعداد">
+                    <button type="submit" class="add-to-cart-btn"
+                            {% if product.counts < 1 %}disabled{% endif %}>
+                        افزودن به سبد خرید
+                    </button>
+                </form>
+            </div>
+        </section>
+    </div>
+
+    <!-- مشخصات فنی -->
+    {% if specifications %}
+        <section class="detail-specifications">
+            <h2>مشخصات فنی</h2>
+            <p class="specifications-subtitle">جزئیات و ویژگی‌های این محصول</p>
+
+            <div class="specifications-list" id="specificationsList">
+                {% for spec in specifications %}
+                    <div class="specification-row {% if forloop.counter > 5 %}spec-hidden{% endif %}">
+                        <div class="specification-label">{{ spec.label }}</div>
+                        <div class="specification-value">{{ spec.value }}</div>
+                    </div>
+                {% endfor %}
+            </div>
+
+            {% if specifications|length > 5 %}
+                <button type="button" class="show-more-btn" id="showMoreSpecs"
+                        aria-expanded="false">
+                    نمایش همه مشخصات
+                    <span class="show-more-arrow">⌄</span>
+                </button>
+            {% endif %}
+        </section>
     {% endif %}
-    <span>{{ product.title }}</span>
-  </nav>
-
-  <div class="detail-card">
-    <div class="detail-gallery">
-      {% if product.image %}
-        <img src="{{ product.image.url }}" alt="{{ product.title }}">
-      {% else %}
-        <div class="product-placeholder">بدون تصویر</div>
-      {% endif %}
-    </div>
-
-    <div class="detail-info">
-      <div class="detail-brand">{{ product.brand }}</div>
-      <h1 class="detail-title">{{ product.title }}</h1>
-      <div class="product-rating">
-        <span class="stars">★★★★★</span>
-        <span>({{ product.rate }})</span>
-      </div>
-      <div class="detail-price">{{ product.price }} <span>تومان</span></div>
-
-      <ul class="detail-facts">
-        {% if product.category %}<li><span>دسته‌بندی</span><b>{{ product.category.title }}</b></li>{% endif %}
-        <li><span>برند</span><b>{{ product.brand }}</b></li>
-        <li><span>فروشنده</span><b>{{ product.seller }}</b></li>
-        {% if product.color %}<li><span>رنگ</span><b>{{ product.color }}</b></li>{% endif %}
-        {% if product.weight %}<li><span>وزن</span><b>{{ product.weight }} گرم</b></li>{% endif %}
-        <li>
-          <span>موجودی</span>
-          {% if product.counts > 0 %}
-            <b class="stock-ok">موجود ({{ product.counts }})</b>
-          {% else %}
-            <b class="stock-low">ناموجود</b>
-          {% endif %}
-        </li>
-      </ul>
-
-      <form action="{% url 'cart_add' product.id %}" method="post" class="detail-buy">
-        {% csrf_token %}
-        <input type="number" name="quantity" value="1" min="1">
-        <button type="submit" class="add-to-cart-btn" {% if product.counts < 1 %}disabled{% endif %}>افزودن به سبد</button>
-      </form>
-    </div>
-  </div>
 </div>
+
+<!-- Lightbox برای نمایش بزرگ تصاویر -->
+<div class="lightbox" id="imageLightbox" aria-hidden="true" role="dialog" aria-modal="true" aria-label="نمایش بزرگ تصویر محصول">
+    <div class="lightbox-backdrop" id="lightboxBackdrop"></div>
+    <div class="lightbox-content">
+        <button type="button" class="lightbox-close" id="lightboxClose" aria-label="بستن">✕</button>
+        <button type="button" class="lightbox-nav lightbox-prev" id="lightboxPrev" aria-label="تصویر قبلی">‹</button>
+        <img id="lightboxImage" src="" alt="" class="lightbox-image" />
+        <button type="button" class="lightbox-nav lightbox-next" id="lightboxNext" aria-label="تصویر بعدی">›</button>
+        <div class="lightbox-thumbnails" id="lightboxThumbnails"></div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const mainImage = document.getElementById('mainProductImage');
+    const thumbnails = document.querySelectorAll('.gallery-thumb');
+    const galleryCount = document.getElementById('galleryCount');
+
+    let currentIndex = 0;
+    const total = thumbnails.length;
+
+    function setMainImage(src, index) {
+        if (!mainImage) return;
+        mainImage.style.opacity = '0';
+        setTimeout(function () {
+            mainImage.src = src;
+            mainImage.style.opacity = '1';
+        }, 120);
+
+        thumbnails.forEach(function (item, i) {
+            const active = i === index;
+            item.classList.toggle('active', active);
+            item.setAttribute('aria-pressed', String(active));
+        });
+
+        currentIndex = index;
+        if (galleryCount) {
+            galleryCount.textContent = (index + 1) + ' از ' + total;
+        }
+        updateThumbNav();
+        scrollThumbIntoView();
+    }
+
+    thumbnails.forEach(function (button, index) {
+        button.addEventListener('click', function () {
+            setMainImage(this.dataset.image, index);
+        });
+    });
+
+    const thumbPrev = document.getElementById('thumbPrev');
+    const thumbNext = document.getElementById('thumbNext');
+    const thumbsContainer = document.querySelector('.gallery-thumbnails');
+
+    function updateThumbNav() {
+        if (!thumbPrev || !thumbNext) return;
+        thumbPrev.disabled = currentIndex === 0;
+        thumbNext.disabled = currentIndex >= total - 1;
+    }
+
+    if (thumbPrev) {
+        thumbPrev.addEventListener('click', function () {
+            if (currentIndex > 0) setMainImage(thumbnails[currentIndex - 1].dataset.image, currentIndex - 1);
+        });
+    }
+    if (thumbNext) {
+        thumbNext.addEventListener('click', function () {
+            if (currentIndex < total - 1) setMainImage(thumbnails[currentIndex + 1].dataset.image, currentIndex + 1);
+        });
+    }
+
+    function scrollThumbIntoView() {
+        const active = document.querySelector('.gallery-thumb.active');
+        if (active && thumbsContainer) {
+            active.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        }
+    }
+
+    updateThumbNav();
+
+    // Lightbox
+    const lightbox = document.getElementById('imageLightbox');
+    const lightboxImg = document.getElementById('lightboxImage');
+    const lightboxClose = document.getElementById('lightboxClose');
+    const lightboxBackdrop = document.getElementById('lightboxBackdrop');
+    const lightboxPrev = document.getElementById('lightboxPrev');
+    const lightboxNext = document.getElementById('lightboxNext');
+    const lightboxThumbnails = document.getElementById('lightboxThumbnails');
+
+    function openLightbox(index) {
+        currentIndex = index;
+        const src = thumbnails[index].dataset.image;
+        lightboxImg.src = src;
+        lightboxImg.alt = thumbnails[index].querySelector('img').alt;
+        lightbox.classList.add('open');
+        lightbox.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+        renderLightboxThumbnails();
+        updateLightboxThumb();
+    }
+
+    function closeLightbox() {
+        lightbox.classList.remove('open');
+        lightbox.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+    }
+
+    function renderLightboxThumbnails() {
+        if (!lightboxThumbnails) return;
+        lightboxThumbnails.innerHTML = '';
+        thumbnails.forEach(function (thumb, i) {
+            var btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'lightbox-thumb' + (i === currentIndex ? ' active' : '');
+            var img = document.createElement('img');
+            img.src = thumb.dataset.image;
+            img.alt = thumb.querySelector('img').alt;
+            btn.appendChild(img);
+            btn.addEventListener('click', function () {
+                lightboxImg.src = thumb.dataset.image;
+                lightboxImg.alt = thumb.querySelector('img').alt;
+                currentIndex = i;
+                updateLightboxThumb();
+            });
+            lightboxThumbnails.appendChild(btn);
+        });
+    }
+
+    function updateLightboxThumb() {
+        document.querySelectorAll('.lightbox-thumb').forEach(function (b, i) {
+            b.classList.toggle('active', i === currentIndex);
+        });
+    }
+
+    function goLightbox(delta) {
+        currentIndex = (currentIndex + delta + total) % total;
+        lightboxImg.src = thumbnails[currentIndex].dataset.image;
+        lightboxImg.alt = thumbnails[currentIndex].querySelector('img').alt;
+        updateLightboxThumb();
+    }
+
+    if (mainImage) {
+        mainImage.addEventListener('click', function () {
+            if (total > 0) openLightbox(currentIndex);
+        });
+    }
+
+    var zoomBtn = document.querySelector('.gallery-zoom-btn');
+    if (zoomBtn) {
+        zoomBtn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            if (total > 0) openLightbox(currentIndex);
+        });
+    }
+
+    if (lightboxClose) lightboxClose.addEventListener('click', closeLightbox);
+    if (lightboxBackdrop) lightboxBackdrop.addEventListener('click', closeLightbox);
+    if (lightboxPrev) lightboxPrev.addEventListener('click', function (e) { e.stopPropagation(); goLightbox(-1); });
+    if (lightboxNext) lightboxNext.addEventListener('click', function (e) { e.stopPropagation(); goLightbox(1); });
+
+    document.addEventListener('keydown', function (e) {
+        if (!lightbox.classList.contains('open')) return;
+        if (e.key === 'Escape') closeLightbox();
+        if (e.key === 'ArrowLeft') goLightbox(-1);
+        if (e.key === 'ArrowRight') goLightbox(1);
+    });
+
+    // مشخصات فنی: نمایش پنج مشخصه در ابتدا و باز کردن بقیه با کلیک
+    var showMoreButton = document.getElementById('showMoreSpecs');
+    var hiddenSpecs = document.querySelectorAll('.spec-hidden');
+
+    if (showMoreButton) {
+        showMoreButton.addEventListener('click', function () {
+            var expanded = this.getAttribute('aria-expanded') === 'true';
+
+            hiddenSpecs.forEach(function (row) {
+                row.classList.toggle('spec-hidden', expanded);
+            });
+
+            this.setAttribute('aria-expanded', String(!expanded));
+            this.innerHTML = expanded
+                ? 'نمایش همه مشخصات <span class="show-more-arrow">⌄</span>'
+                : 'نمایش کمتر <span class="show-more-arrow">⌃</span>';
+        });
+    }
+});
+</script>
 {% endblock %}
